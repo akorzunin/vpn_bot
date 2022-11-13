@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  vpnbot:
+    image: vpnbot
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        DEBUG: ${DEBUG}
+    ports:
+      - ${PORT}:${PORT}
+    env_file:
+      - .env
