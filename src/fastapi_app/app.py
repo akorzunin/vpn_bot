@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 import logging
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
@@ -7,6 +8,7 @@ from fastapi.responses import JSONResponse
 from src.logger import format as log_format
 from src.fastapi_app import shemas
 from src.tasks import test_task
+from src.tasks.scheduler import scheduler
 
 app = FastAPI(
     # openapi_tags=tags_metadata,
@@ -31,6 +33,11 @@ async def startup_event():
 async def test_endpoint(
     message: str,
 ):
+    def tick():
+        print(f'Tick! The time is: {datetime.now()}')
+        raise NotImplementedError
+
+    scheduler.add_job(tick, 'interval', seconds=3, name='pepe')
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content=shemas.Message(message=message).dict(),
@@ -45,8 +52,11 @@ async def test_endpoint(
     task: shemas.Task,
 ):
 
-    test_task.count_words.send("http://google.com")
+    # test_task.count_words.send("http://google.com")
     message = 'Task created... i guess'
+    # scheduler.remove_job()
+    a = scheduler.get_jobs()
+    scheduler.remove_job(next(i.id for i in a if i.name == 'pepe'))
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content=shemas.Message(message=message).dict(),
