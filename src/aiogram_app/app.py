@@ -26,6 +26,18 @@ async def start(message: types.Message):
     else:
         await message.answer("User created")
 
+# new command tral which aloow user to connect to service for free for 1 month
+@dp.message_handler(commands=["trial"])
+async def trial(message: types.Message):
+    # get user form db by id
+    user = await get_user_by_id(message.from_user.id)
+    # if user in db dont allow hom to use trial
+    if user:
+        await message.answer("User already exists")
+    else:
+        # create user in db
+        await create_user(message.from_user.id)
+        await message.answer(f"Trial for user {message.from_user.id} created")
 
 @dp.message_handler(commands=["help"])
 async def send_welcome(message: types.Message, *args):
