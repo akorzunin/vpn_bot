@@ -35,7 +35,7 @@ class User(BaseModel):
     created_at: datetime = datetime.now()
     telegram_id: int
     conf_files: Optional[VpnConfig] = None
-    is_enbled: bool = True
+    is_enabled: bool = True
     strick_time: int = 1
     next_payment: Optional[datetime] = None
     all_payments: list[VpnPaymentId] = []

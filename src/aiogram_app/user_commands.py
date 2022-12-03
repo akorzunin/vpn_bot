@@ -2,6 +2,7 @@
 from aiogram import types
 
 from src.aiogram_app.aiogram_app import dp
+from src.aiogram_app.message_formatters import prepare_user_str
 from src.db import crud
 from src.fastapi_app import user_routes
 
@@ -16,7 +17,9 @@ async def t_me(message: types.Message):
             "User not found, u can create a new one with /start"
         )
     else:
-        await message.answer(f"user info: {user}")
+        # format user in human readable format
+        user_str = prepare_user_str(user)
+        await message.answer(user_str)
 
 
 @dp.message_handler(commands=["delete_user", "del_me"])
