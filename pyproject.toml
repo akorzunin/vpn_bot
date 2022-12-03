@@ -13,6 +13,8 @@ uvicorn = "^0.19.0"
 python-dotenv = "^0.21.0"
 tinydb = "^4.7.0"
 APScheduler = "^3.9.1.post1"
+pydantic = {extras = ["email"], version = "^1.10.2"}
+tinydb-serialization = "^2.1.0"
 
 [tool.poetry.group.dev]
 optional = true
