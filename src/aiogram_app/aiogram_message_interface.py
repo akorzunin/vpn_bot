@@ -1,8 +1,13 @@
+"""Allow other app in event loop use telegram api to send messages to users"""
+
+
 from aiogram import Bot
 import os
 
-TOKEN = os.getenv("TOKEN")
-operator = Bot(TOKEN)
+if TOKEN := os.getenv("TOKEN"):
+    operator = Bot(TOKEN)
+else:
+    raise ValueError("TOKEN is not set in .env file")
 
 
 async def send_message_to_user_by_id(user_id: int, message: str):

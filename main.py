@@ -3,8 +3,8 @@ from datetime import datetime
 import os
 import uvicorn
 
-from src.aiogram_app import app as aiogram_app
-from src.fastapi_app.app import app
+from src.aiogram_app import aiogram_app
+from src.fastapi_app.fastapi_app import app
 from src.fastapi_app.uvicrorn_confgis import uvicorn_conf
 from src.tasks.scheduler import scheduler
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # tasks
 
     # setup debug console to work w/ awaitables
-    if bool(eval(os.getenv('DEBUG'))):
+    if bool(eval(os.getenv('DEBUG'))):  # type: ignore
         # import nest_asyncio
         # nest_asyncio.apply(loop) 
         # loop.set_debug(1)
