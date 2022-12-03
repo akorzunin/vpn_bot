@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -29,13 +30,13 @@ class VpnPayment(BaseModel):
 
 
 class User(BaseModel):
-    id: int
-    last_payment: datetime
-    created_at: datetime
+    last_payment: Optional[datetime] = None
+    user_name: Optional[str] = None
+    created_at: datetime = datetime.now()
     telegram_id: int
-    conf_files: VpnConfig
-    is_enbled: bool
-    strick_time: int
-    next_payment: datetime
-    all_payments: list[VpnPaymentId]
-    balance: Money
+    conf_files: Optional[VpnConfig] = None
+    is_enbled: bool = True
+    strick_time: int = 1
+    next_payment: Optional[datetime] = None
+    all_payments: list[VpnPaymentId] = []
+    balance: Money = Money(0)
