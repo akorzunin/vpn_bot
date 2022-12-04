@@ -16,6 +16,7 @@ class VpnPaymentId(int):
 class VpnConfig(BaseModel):
     path: str
     user_name: str
+    pivpn_id: int
     private_key: str
     ip: str
     shared_key: str
