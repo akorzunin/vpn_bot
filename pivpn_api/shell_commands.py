@@ -19,6 +19,7 @@ get_all_clients = ["pivpn", "-c"]
 add_client = [
     "pivpn",
     "-a",
+    "-n",
 ]  # prompt for client name
 
 qr_client = [
@@ -29,11 +30,13 @@ qr_client = [
 disable_client = [
     "pivpn",
     "-off",
+    "-y",
 ]  # prompt for client number
 
 enable_client = [
     "pivpn",
     "-on",
+    "-y",
 ]  # prompt for client number
 
 list_clients = [

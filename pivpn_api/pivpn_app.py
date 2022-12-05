@@ -40,10 +40,10 @@ async def add_client(user_name: str):
 
 
 @app.get("/qr_client")
-async def qr_client(client_no: int):
+async def qr_client(user_name: str):
     """get the qr code for a client"""
     result = shell_commands.run_shell_command(
-        shell_commands.qr_client + [str(client_no)]
+        shell_commands.qr_client + [user_name]
     )
     if isinstance(result, Exception):
         return JSONResponse(status_code=400, content={"stdout": str(result)})
@@ -51,10 +51,10 @@ async def qr_client(client_no: int):
 
 
 @app.post("/disable_client")
-async def disable_client(client_no: int):
+async def disable_client(user_name: str):
     """disable a client"""
     result = shell_commands.run_shell_command(
-        shell_commands.disable_client + [str(client_no)]
+        shell_commands.disable_client + [user_name]
     )
     if isinstance(result, Exception):
         return JSONResponse(status_code=400, content={"stdout": str(result)})
@@ -62,10 +62,10 @@ async def disable_client(client_no: int):
 
 
 @app.post("/enable_client")
-async def enable_client(client_no: int):
+async def enable_client(user_name: str):
     """enable a client"""
     result = shell_commands.run_shell_command(
-        shell_commands.enable_client + [str(client_no)]
+        shell_commands.enable_client + [user_name]
     )
     if isinstance(result, Exception):
         return JSONResponse(status_code=400, content={"stdout": str(result)})
