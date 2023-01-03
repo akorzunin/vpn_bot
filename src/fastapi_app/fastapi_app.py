@@ -9,6 +9,7 @@ from src.fastapi_app import shemas
 from src.logger import format as log_format
 from src.tasks.scheduler import scheduler
 from src.fastapi_app.user_routes import router as user_router
+from src.fastapi_app.admin_routes import router as admin_router
 
 app = FastAPI(
     # openapi_tags=tags_metadata,
@@ -16,6 +17,9 @@ app = FastAPI(
 
 # include router for users
 app.include_router(user_router, prefix="/user", tags=["user"])
+
+# include router for admin
+app.include_router(admin_router, prefix="/admin", tags=["admin"])
 
 
 @app.on_event("startup")
@@ -52,7 +56,7 @@ async def test_endpoint(
     response_model=shemas.Message,
     status_code=status.HTTP_201_CREATED,
 )
-async def test_endpoint(
+async def create_task_endpoint(
     task: shemas.Task,
 ):
 
