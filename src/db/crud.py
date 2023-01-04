@@ -13,6 +13,8 @@ async def get_user_by_telegram_id(telegram_id: int) -> User | None:
     # get one user by id
     if user := users.get(where("telegram_id") == telegram_id):
         return User(**user)
+    return None
+
 
 # create user
 async def create_user(user) -> None:

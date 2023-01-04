@@ -12,3 +12,9 @@ router = APIRouter()
 async def get_all_users():
     """get all users"""
     return pivpn.get_all_users()
+
+
+@router.get("/get_user_qr/{client}")
+async def get_user_qr(client: int):
+    """get user qr"""
+    return pivpn.get_qr_client(client)

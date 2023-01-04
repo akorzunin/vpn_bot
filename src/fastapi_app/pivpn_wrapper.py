@@ -4,6 +4,22 @@ import re
 
 PIVPN_HOST = os.getenv("PIVPN_HOST", "192.168.1.132:7070")
 
+strip_ansi_codes = lambda s: re.sub(
+    r"\x1b\[([0-9,A-Z]{1,2}(;[0-9]{1,2})?(;[0-9]{3})?)?[m|K]?", "", s
+)
+parse_line = lambda line: re.split(r"\s{2,}", strip_ansi_codes(line))
+
+
+def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> str:
+    r = requests.get(f"http://{host}/qr_client?user_name={client}")
+    data = r.json()["stdout"]
+    qr = [
+        i[3:] + "\n"
+        for i in strip_ansi_codes(data).splitlines()
+        if i.startswith(";1m")
+    ]
+    return "".join(qr)
+
 
 def get_all_users(host: str = PIVPN_HOST) -> dict:
     r = requests.get(f"http://{host}/get_all_clients")
