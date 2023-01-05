@@ -1,5 +1,6 @@
+from io import BytesIO
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import StreamingResponse
 
 # import pivpn_wrapper
 from src.fastapi_app import pivpn_wrapper as pivpn
@@ -17,4 +18,9 @@ async def get_all_users():
 @router.get("/get_user_qr/{client}")
 async def get_user_qr(client: int):
     """get user qr"""
-    return pivpn.get_qr_client(client)
+    data = pivpn.get_qr_client(client)
+    bio = BytesIO()
+    bio.name = "image.jpeg"
+    data.save(bio, "JPEG")
+    bio.seek(0)
+    return StreamingResponse(bio, media_type="image/jpeg")

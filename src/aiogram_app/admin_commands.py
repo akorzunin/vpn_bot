@@ -35,6 +35,8 @@ async def get_user(
     # telegram_id = message.from_user.id
     # get user from db by tlegram id
     # user = await crud.get_user_by_telegram_id(telegram_id)
-
     data = await admin_routes.get_user_qr(int(client_no))
-    await message.answer(data)
+    await message.answer_photo(
+        data.body_iterator,
+        caption=f"QR code for client {client_no}",
+    )

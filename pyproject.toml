@@ -16,6 +16,7 @@ APScheduler = "^3.9.1.post1"
 pydantic = {extras = ["email"], version = "^1.10.2"}
 tinydb-serialization = "^2.1.0"
 types-requests = "^2.28.11.7"
+Pillow = "^9.4.0"
 
 [tool.poetry.group.dev]
 optional = true

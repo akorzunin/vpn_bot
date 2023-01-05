@@ -1,6 +1,7 @@
 import requests
 import os
 import re
+from PIL import Image, ImageDraw, ImageFont
 
 PIVPN_HOST = os.getenv("PIVPN_HOST", "192.168.1.132:7070")
 
@@ -10,7 +11,7 @@ strip_ansi_codes = lambda s: re.sub(
 parse_line = lambda line: re.split(r"\s{2,}", strip_ansi_codes(line))
 
 
-def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> str:
+def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> Image.Image:
     r = requests.get(f"http://{host}/qr_client?user_name={client}")
     data = r.json()["stdout"]
     qr = [
@@ -18,7 +19,17 @@ def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> str:
         for i in strip_ansi_codes(data).splitlines()
         if i.startswith(";1m")
     ]
-    return "".join(qr)
+    qr_str = "".join(qr)
+    colorText = "white"
+    colorBackground = "black"
+    font = ImageFont.truetype("cour.ttf", size=12, encoding="unic")
+    # fontsize = 12 => width of char -> 7 height of char -> 14
+    width, height = (len(qr[0]) - 1) * 7, len(qr) * 14
+    img = Image.new("RGB", (width, height), colorBackground)
+    d = ImageDraw.Draw(img)
+    d.text((0, 0), qr_str, fill=colorText, font=font)
+
+    return img
 
 
 def get_all_users(host: str = PIVPN_HOST) -> dict:
