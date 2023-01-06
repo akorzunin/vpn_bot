@@ -2,7 +2,11 @@
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-import shell_commands
+
+try:
+    import shell_commands
+except ImportError:
+    from . import shell_commands
 
 app = FastAPI()
 
@@ -72,7 +76,7 @@ async def enable_client(user_name: str):
     return {"stdout": result}
 
 
-@app.post("/list_clients")
+@app.get("/list_clients")
 async def list_clients():
     """list all the clients"""
     result = shell_commands.run_shell_command(shell_commands.list_clients)

@@ -14,7 +14,10 @@ whoami = [
     "whoami",
 ]
 
-get_all_clients = ["pivpn", "-c"]
+get_all_clients = [
+    "pivpn",
+    "-c",
+]
 
 add_client = [
     "pivpn",
