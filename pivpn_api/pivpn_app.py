@@ -98,9 +98,11 @@ async def backup_clients():
 @app.get("/speed_test")
 async def speed_test(type: Literal["full", ""] = ""):
     """run a speed test"""
-    if not type:
-        shell_commands.speed_test.append("--simple")
-    result = shell_commands.run_shell_command(shell_commands.speed_test)
+    result = shell_commands.run_shell_command(
+        shell_commands.speed_test + ["--simple"]
+        if type == ""
+        else shell_commands.speed_test
+    )
     if isinstance(result, Exception):
         return JSONResponse(status_code=400, content={"stdout": str(result)})
     return {"stdout": result}
