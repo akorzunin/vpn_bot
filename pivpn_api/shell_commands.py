@@ -51,3 +51,7 @@ backup_clients = [
     "pivpn",
     "-bk",
 ]  # save files to /home/wirevpn/pivpnbackup/*.tgz
+
+speed_test = [
+    "speedtest-cli",
+]
