@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 import requests
 import os
 import re
@@ -164,3 +164,25 @@ def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> Image.Image:
 def get_all_users(host: str = PIVPN_HOST) -> dict:
     raw_res_text = api_call("get", "get_all_clients", host=host)
     return parse_table(raw_res_text)
+
+
+def get_speedtest(
+    type: Literal["full", ""] = "", host: str = PIVPN_HOST
+) -> dict:
+    data = api_call("get", "speed_test", params={"type": ""}, host=host)
+    speed_data: dict[str, str | dict[str, str]] = {}
+    if "speedtest-cli" in data:
+        raise ValueError(f"Speedtest-cli not installed on {host}")
+    if type:
+        for line in data.splitlines():
+            if "Mbit/s" in line:
+                name, value, units = line.split()
+                speed_data[name] = {"value": value, "units": units}
+        speed_data["raw_text"] = data
+    else:
+        # parse data output for --simple flag
+        for line in data.splitlines():
+            if "Ping:" or "Download:" or "Upload:" in line:
+                name, value, units = line.split()
+                speed_data[name] = {"value": value, "units": units}
+    return speed_data
