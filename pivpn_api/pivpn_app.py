@@ -1,5 +1,6 @@
 """fastapi app to call shell commands from pivpn"""
 
+from typing import Literal
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -89,6 +90,17 @@ async def list_clients():
 async def backup_clients():
     """backup all the clients"""
     result = shell_commands.run_shell_command(shell_commands.backup_clients)
+    if isinstance(result, Exception):
+        return JSONResponse(status_code=400, content={"stdout": str(result)})
+    return {"stdout": result}
+
+
+@app.get("/speed_test")
+async def speed_test(type: Literal["full", ""] = ""):
+    """run a speed test"""
+    if not type:
+        shell_commands.speed_test.append("--simple")
+    result = shell_commands.run_shell_command(shell_commands.speed_test)
     if isinstance(result, Exception):
         return JSONResponse(status_code=400, content={"stdout": str(result)})
     return {"stdout": result}
