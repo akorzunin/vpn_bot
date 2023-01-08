@@ -3,6 +3,7 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.utils.exceptions import TelegramAPIError
+from fastapi import HTTPException
 
 API_TOKEN = os.getenv(
     "TOKEN",
@@ -29,4 +30,14 @@ from src.aiogram_app import admin_commands
 async def message_not_modified_handler(update, error):
     logging.error(f"Get error from telegram API: {error}")
     # errors_handler must return True if error was handled correctly
+    return True
+
+
+@dp.errors_handler(exception=HTTPException)
+async def http_exception_handler(update: types.Update, error: HTTPException):
+    logging.error(f"Get error from httpexception: {error.detail}")
+    await bot.send_message(
+        update.message.chat.id,
+        f"{error.detail}",
+    )
     return True
