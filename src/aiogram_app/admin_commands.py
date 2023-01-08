@@ -31,11 +31,11 @@ async def get_user(
     if not client_no:
         await message.answer("Please provide client name")
         return
-    # get telegram_id from message
-    # telegram_id = message.from_user.id
-    # get user from db by tlegram id
-    # user = await crud.get_user_by_telegram_id(telegram_id)
-    data = await admin_routes.get_user_qr(int(client_no))
+    try:
+        data = await admin_routes.get_user_qr(client_no)
+    except ValueError as e:
+        await message.answer(str(e))
+        return
     await message.answer_photo(
         data.body_iterator,
         caption=f"QR code for client {client_no}",

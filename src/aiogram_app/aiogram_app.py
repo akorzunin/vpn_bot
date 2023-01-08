@@ -10,7 +10,7 @@ API_TOKEN = os.getenv(
 # check if token exist else rise error
 if not API_TOKEN:
     raise ValueError("TOKEN is not set in .env file")
-bot = Bot(token=API_TOKEN)
+bot = Bot(API_TOKEN)
 dp = Dispatcher(bot)
 
 # register user_commands

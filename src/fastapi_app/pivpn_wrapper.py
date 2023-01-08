@@ -6,6 +6,11 @@ from PIL import Image, ImageDraw, ImageFont
 from inspect import getmembers, isfunction
 
 from pivpn_api import pivpn_app
+from src.utils.errors.pivpn_errors import (
+    UserAlreadyDisabledError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
 
 PIVPN_HOST = os.getenv("PIVPN_HOST", "192.168.1.132:7070")
 
@@ -24,19 +29,23 @@ def parse_col(columns, line):
     return dict(zip(columns, parse_line(line)))
 
 
-def parse_table(raw_res_text: str) -> dict:
+def parse_table(
+    raw_res_text: str,
+    enabled_dilimiter: str = "::: Clients Summary :::",
+    disabled_dilimiter: str = "::: Disabled clients :::",
+) -> dict:
     """parse output as two list of users: enabled and disabled"""
-    enabled_users = disabled_users = columns = []
+    enabled_users, disabled_users, columns = [], [], []
     enabled = header = None
     for line in raw_res_text.splitlines():
-        if "::: Clients Summary :::" in line and enabled is None:
+        if enabled_dilimiter in line and enabled is None:
             enabled = header = True
             continue
-        if line.startswith("::: Disabled clients :::") and enabled:
+        if line.startswith(disabled_dilimiter) and enabled:
             enabled = False
             columns = [
-                "type",
-                "name",
+                "Type",
+                "Name",
             ]
             continue
         if enabled is True:
@@ -74,7 +83,7 @@ def add_client(client: str, host: str = PIVPN_HOST) -> str:
     )
     # parse data
     if not data:
-        raise ValueError(f"Failed to create client: {client}")
+        raise UserAlreadyExistsError(f"Client already exists: {client}")
     success = filename = path = None
     for line in data.splitlines():
         if "Done!" in line:
@@ -112,6 +121,10 @@ def disable_client(client: str, host: str = PIVPN_HOST) -> str:
         if "::: Successfully disabled" in line:
             break
     else:
+        if "not exist" in data:
+            raise UserNotFoundError(f"Client does not exist: {client}")
+        if "already disabled" in data:
+            raise UserAlreadyDisabledError(f"Client already disabled: {client}")
         raise ValueError(f"Failed to disable client: {client}")
     return client
 
@@ -124,6 +137,10 @@ def enable_client(client: str, host: str = PIVPN_HOST) -> str:
         if "::: Successfully enabled" in line:
             break
     else:
+        if "not exist" in data:
+            raise UserNotFoundError(f"Client does not exist: {client}")
+        if "already disabled" in data:
+            raise UserAlreadyDisabledError(f"Client already disabled: {client}")
         raise ValueError(f"Failed to enable client: {client}")
     return client
 
@@ -163,10 +180,14 @@ def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> Image.Image:
 
 def get_all_users(host: str = PIVPN_HOST) -> dict:
     raw_res_text = api_call("get", "get_all_clients", host=host)
-    return parse_table(raw_res_text)
+    return parse_table(
+        raw_res_text,
+        enabled_dilimiter="::: Connected Clients List :::",
+        disabled_dilimiter="::: Disabled clients :::",
+    )
 
 
-def get_speedtest(
+def get_speed_test(
     type: Literal["full", ""] = "", host: str = PIVPN_HOST
 ) -> dict:
     data = api_call("get", "speed_test", params={"type": ""}, host=host)
