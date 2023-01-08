@@ -3,11 +3,14 @@
 """
 
 from aiogram import types
+from fastapi.security import HTTPBasicCredentials
 
 from src.aiogram_app.aiogram_app import dp
 from src.aiogram_app.message_formatters import prepare_all_user_str
+from src.aiogram_app.telegram_auth import login_admin
 from src.fastapi_app import admin_routes
 from src.db import crud
+from src.fastapi_app.auth import security
 
 
 @dp.message_handler(commands=["add_client"])
@@ -32,7 +35,7 @@ async def backup_clients(
     message: types.Message,
 ):
     """"""
-    data = await admin_routes.backup_clients()
+    data = await admin_routes.backup_clients(login_admin(message.from_user.id))
     await message.answer(data)
 
 

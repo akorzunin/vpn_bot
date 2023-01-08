@@ -1,10 +1,12 @@
 from io import BytesIO
 from typing import Literal
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPBasicCredentials
 
 # import pivpn_wrapper
 from src.fastapi_app import pivpn_wrapper as pivpn
+from src.fastapi_app.auth import check_credentials, security
 
 router = APIRouter()
 # TODO add authentication for admin routes
@@ -20,8 +22,11 @@ async def add_client(client: str):
 
 
 @router.post("/backup_clients")
-async def backup_clients():
+async def backup_clients(
+    credentials: HTTPBasicCredentials = Depends(security),
+):
     """backup clients"""
+    check_credentials(credentials)
     return pivpn.backup_clients()
 
 
