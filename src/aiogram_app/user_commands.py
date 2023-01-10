@@ -34,3 +34,22 @@ async def delete_user(message: types.Message):
         )
     elif response.status_code == 200:
         await message.answer("User deleted")
+
+
+@dp.message_handler(commands=["remove_config", "del_config"])
+async def remove_config(message: types.Message, *args):
+    """remove vpn config from user"""
+
+    # get arg as user_name
+    user_name = message.get_args()
+    if not user_name:
+        await message.answer("Please provide config user name")
+        return
+    # call fastapi to delete user
+    response = await user_routes.remove_vpn_config(
+        message.from_user.id, user_name
+    )
+    if response.status_code == 400:
+        await message.answer("User not found")
+    elif response.status_code == 200:
+        await message.answer("VPN config removed")
