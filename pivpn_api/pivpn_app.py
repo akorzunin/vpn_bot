@@ -108,6 +108,17 @@ async def speed_test(type: Literal["full", ""] = ""):
     return {"stdout": result}
 
 
+@app.get("/get_config_by_filepath")
+async def get_config_by_filepath(filepath: str):
+    """get the config file by filepath"""
+    result = shell_commands.run_shell_command(
+        shell_commands.get_config_by_filepath + [filepath]
+    )
+    if isinstance(result, Exception):
+        return JSONResponse(status_code=400, content={"stdout": str(result)})
+    return {"stdout": result}
+
+
 # main
 if __name__ == "__main__":
     import uvicorn
