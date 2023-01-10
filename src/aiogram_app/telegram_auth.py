@@ -4,7 +4,9 @@ from typing import Sequence
 from fastapi.security import HTTPBasicCredentials
 
 # TODO handle empty ADMINS env var and convert to ints
-admin_users: Sequence[str] = tuple(os.getenv("ADMINS", "").split(", "))
+admin_users: Sequence[str] = tuple(
+    os.getenv("ADMINS", "").split(", ") if os.getenv("ADMINS", "") else []
+)
 
 
 def login_admin(user_id: int):
