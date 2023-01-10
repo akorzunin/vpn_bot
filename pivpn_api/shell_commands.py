@@ -55,3 +55,7 @@ backup_clients = [
 speed_test = [
     "speedtest-cli",
 ]
+
+get_config_by_filepath = [
+    "cat",
+]
