@@ -5,9 +5,9 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 try:
-    import shell_commands
+    from pivpn_api import shell_commands
 except ImportError:
-    from . import shell_commands
+    import shell_commands
 
 app = FastAPI()
 
