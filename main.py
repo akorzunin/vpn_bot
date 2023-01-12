@@ -17,20 +17,9 @@ if __name__ == "__main__":
     loop.create_task(server.serve())
     # start scheduler
     scheduler.start()
-
-    # tasks
-
-    # setup debug console to work w/ awaitables
-    if bool(eval(os.getenv("DEBUG"))):  # type: ignore
-        # import nest_asyncio
-        # nest_asyncio.apply(loop)
-        # loop.set_debug(1)
-        ...
-
     # message_handler.setup(aiogram_app.dp)
     aiogram_app.executor.start_polling(
         aiogram_app.dp,
         skip_updates=True,
     )
-    if 1:
-        loop.run_forever()
+    loop.run_forever()
