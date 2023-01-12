@@ -207,3 +207,13 @@ def get_speed_test(
                 name, value, units = line.split()
                 speed_data[name] = {"value": value, "units": units}
     return speed_data
+
+
+def get_config_by_filepath(filepath: str) -> str:
+    """Get config data from file path"""
+    data = api_call(
+        "get", "get_config_by_filepath", params={"filepath": filepath}
+    )
+    if not data.startswith("[Interface]"):
+        raise ValueError("Invalid config file")
+    return data

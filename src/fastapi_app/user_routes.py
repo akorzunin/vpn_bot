@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from src.db import crud
 from src.db.schemas import User, UserUpdate, VpnConfig
+from src.fastapi_app import pivpn_wrapper as pivpn
 
 router = APIRouter()
 
@@ -77,3 +78,12 @@ async def remove_vpn_config(user_id: int, vpn_user: str):
             status_code=200, content={"message": "Vpn config removed"}
         )
     return JSONResponse(status_code=400, content="User not found")
+
+
+@router.get("/get_vpn_config/{file_path}")
+async def get_vpn_config(file_path: str):
+    """get vpn config from PIVPN"""
+    try:
+        return pivpn.get_config_by_filepath(file_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
