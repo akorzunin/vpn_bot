@@ -79,10 +79,6 @@ async def add_config(message: types.Message, *args):
     vpn_config = VpnConfig(
         path=file_path,
         user_name=user_name,
-        pivpn_id=123,
-        private_key="str",
-        ip="str",
-        shared_key="str",
     )
     # call fastapi to delete user
     response = await user_routes.add_vpn_config(
