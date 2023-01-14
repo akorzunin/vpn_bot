@@ -116,3 +116,15 @@ async def list_configs(
         escape_markdown(format_many_vpn_configs(conf_data)),
         parse_mode="Markdown",
     )
+
+
+@dp.message_handler(commands=["balance", "get_balance"])
+async def get_balance(message: types.Message):
+    """get balance of user"""
+    user = await crud.get_user_by_telegram_id(message.from_user.id)
+    if user:
+        await message.answer(
+            f"Balance: {user.balance}\nNext payment: {user.next_payment}"
+        )
+        return
+    await message.answer("User not found")

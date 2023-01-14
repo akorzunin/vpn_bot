@@ -8,6 +8,7 @@ from fastapi.security import HTTPBasicCredentials
 from src.aiogram_app.aiogram_app import dp
 from src.aiogram_app.message_formatters import prepare_all_user_str
 from src.aiogram_app.telegram_auth import login_admin
+from src.db.schemas import Money
 from src.fastapi_app import admin_routes
 from src.db import crud
 from src.fastapi_app.auth import security
@@ -126,3 +127,49 @@ async def speed_test(
     """"""
     data = await admin_routes.speed_test()
     await message.answer(str(data))
+
+
+@dp.message_handler(commands=["create_payment"])
+async def create_payment(
+    message: types.Message,
+    *args,
+):
+    """Makes a payment for a user"""
+    if raw_args := message.get_args():
+        args = raw_args.split()
+        if len(args) != 2:
+            await message.answer("Please provide client name and amount")
+            return
+        user_name, amount = args
+
+        res = await admin_routes.create_payment(
+            Money(amount),
+            user_name,
+        )
+        if res:
+            await message.answer("Payment created")
+        else:
+            await message.answer("Payment not created")
+
+
+@dp.message_handler(commands=["create_invoice"])
+async def create_invoice(
+    message: types.Message,
+    *args,
+):
+    """Manually create an invoice for user"""
+    if raw_args := message.get_args():
+        args = raw_args.split()
+        if len(args) != 2:
+            await message.answer("Please provide client name and amount")
+            return
+        user_name, amount = args
+
+        res = await admin_routes.create_invoice(
+            Money(amount),
+            user_name,
+        )
+        if res:
+            await message.answer("Invoice created")
+        else:
+            await message.answer("Invoice not created")

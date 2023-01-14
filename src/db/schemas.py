@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -9,7 +10,7 @@ class Money(float):
     ...
 
 
-class VpnPaymentId(int):
+class VpnPaymentId(str):
     ...
 
 
@@ -19,7 +20,7 @@ class VpnConfig(BaseModel):
 
 
 class VpnPayment(BaseModel):
-    # id: VpnPaymentId
+    id: VpnPaymentId
     user_id: int
     amount: Money
     date: datetime

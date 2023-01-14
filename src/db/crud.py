@@ -2,10 +2,19 @@
     Even if tinydb is not async functions is still coroutines
     in order to migrate to async db connector in future
 """
+from datetime import datetime
+from uuid import uuid4
 from tinydb import Query, where
 
-from src.db.db_conn import users
-from src.db.schemas import User, UserUpdate, VpnConfig
+from src.db.db_conn import users, payments
+from src.db.schemas import (
+    Money,
+    User,
+    UserUpdate,
+    VpnConfig,
+    VpnPayment,
+    VpnPaymentId,
+)
 from src.utils.errors.config_errors import ConfigException
 
 
@@ -13,6 +22,13 @@ from src.utils.errors.config_errors import ConfigException
 async def get_user_by_telegram_id(telegram_id: int) -> User | None:
     # get one user by id
     if user := users.get(where("telegram_id") == telegram_id):  # type: ignore
+        return User(**user)
+    return None
+
+
+async def get_user_by_user_name(username: str) -> User | None:
+    # get one user by id
+    if user := users.get(where("user_name") == username):  # type: ignore
         return User(**user)
     return None
 
@@ -82,3 +98,62 @@ def remove_vpn_config(telegram_id: int, vpn_user: str) -> None:
         {"conf_files": vpn_configs},
         User.telegram_id == telegram_id,  # type: ignore
     )
+
+
+async def create_payment(user_id: int, amount: Money):
+    payment_id = VpnPaymentId(uuid4())
+    payment = VpnPayment(
+        id=payment_id,
+        user_id=user_id,
+        amount=amount,
+        date=datetime.now(),
+        is_confirmed=True,
+    )
+
+    User = Query()
+    # get all payments
+    user = users.get(User.telegram_id == user_id)  # type: ignore
+    if not user:
+        raise ValueError("User not found")
+    user_payments = user["all_payments"]
+    if user_payments is None:
+        user_payments = []
+    # add new payment
+    user_payments.append(payment_id)
+    users.update(
+        {"all_payments": user_payments, "balance": user["balance"] + amount},
+        User.telegram_id == user_id,  # type: ignore
+    )
+    # insert payment
+    payments.insert(payment.dict())
+
+
+async def create_invoice(user_id: int, amount: Money):
+    payment_id = VpnPaymentId(uuid4())
+    payment = VpnPayment(
+        id=payment_id,
+        user_id=user_id,
+        amount=Money(-abs(amount)),
+        date=datetime.now(),
+        is_confirmed=True,
+    )
+
+    User = Query()
+    # get all payments
+    user = users.get(User.telegram_id == user_id)  # type: ignore
+    if not user:
+        raise ValueError("User not found")
+    user_payments = user["all_payments"]
+    if user_payments is None:
+        user_payments = []
+    # add new payment
+    user_payments.append(payment_id)
+    users.update(
+        {
+            "all_payments": user_payments,
+            "balance": user["balance"] - payment.amount,
+        },
+        User.telegram_id == user_id,  # type: ignore
+    )
+    # insert payment
+    payments.insert(payment.dict())
