@@ -1,7 +1,10 @@
 """fastapi router for user routes"""
+from uuid import UUID
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
+
 from src.db import crud
+from src.db import promocode_functions
 from src.db.schemas import User, UserUpdate, VpnConfig
 from src.fastapi_app import pivpn_wrapper as pivpn
 
@@ -85,5 +88,27 @@ async def get_vpn_config(file_path: str):
     """get vpn config from PIVPN"""
     try:
         return pivpn.get_config_by_filepath(file_path)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.get("/redeem_code")
+async def redeem_code(
+    user_id: int,
+    code_alias: str = "",
+    code_id: UUID | None = None,
+):
+    """redeem code"""
+    try:
+        if prmocode_id := promocode_functions.use_check_promocode(
+            user_id,
+            code_alias,
+            code_id,
+        ):
+            return JSONResponse(
+                status_code=200,
+                content={"message": "Code redeemed", "id": prmocode_id},
+            )
+        raise HTTPException(status_code=401, detail="Failed to redeem code")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

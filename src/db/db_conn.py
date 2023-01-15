@@ -12,3 +12,4 @@ db = TinyDB("./data/db.json", storage=serialization)
 
 users = db.table("users")
 payments = db.table("payments")
+promocodes = db.table("promocodes")

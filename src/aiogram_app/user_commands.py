@@ -44,7 +44,7 @@ async def delete_user(message: types.Message):
 
 
 @dp.message_handler(commands=["remove_config", "del_config"])
-async def remove_config(message: types.Message, *args):
+async def remove_config(message: types.Message):
     """remove vpn config from user"""
 
     # get arg as user_name
@@ -63,7 +63,7 @@ async def remove_config(message: types.Message, *args):
 
 
 @dp.message_handler(commands=["add_config", "add_vpn_config"])
-async def add_config(message: types.Message, *args):
+async def add_config(message: types.Message):
     """add vpn config to user"""
 
     # get arg as user_name
@@ -94,9 +94,7 @@ async def add_config(message: types.Message, *args):
 
 
 @dp.message_handler(commands=["list_configs", "list_vpn_configs"])
-async def list_configs(
-    message: types.Message,
-):
+async def list_configs(message: types.Message):
     """list vpn configs of user"""
     # get user from fastapi
     user = await user_routes.get_user_by_id(message.from_user.id)
@@ -128,3 +126,17 @@ async def get_balance(message: types.Message):
         )
         return
     await message.answer("User not found")
+
+
+@dp.message_handler(commands=["redeem", "redeem_code"])
+async def redeem_code(message: types.Message):
+    """redeem code"""
+    code = message.get_args()
+    if not code:
+        await message.answer("Please provide code")
+        return
+    response = await user_routes.redeem_code(message.from_user.id, code)
+    if response.status_code == 400:
+        await message.answer("User not found")
+    elif response.status_code == 200:
+        await message.answer("Code redeemed")

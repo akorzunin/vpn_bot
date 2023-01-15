@@ -14,6 +14,10 @@ class VpnPaymentId(str):
     ...
 
 
+class PromocodeId(str):
+    ...
+
+
 class VpnConfig(BaseModel):
     path: str
     user_name: str
@@ -23,7 +27,7 @@ class VpnPayment(BaseModel):
     id: VpnPaymentId
     user_id: int
     amount: Money
-    date: datetime
+    date: datetime = datetime.now()
     is_confirmed: bool
 
 
@@ -47,3 +51,15 @@ class UserUpdate(BaseModel):
     next_payment: Optional[datetime] = None
     all_payments: Optional[list[VpnPaymentId]] = None
     balance: Optional[Money] = None
+
+
+class PromoCode(BaseModel):
+    id: PromocodeId
+    function: str
+    alias: str = ""
+    user_id: int | None = None
+    value: str = ""
+    is_redemed: bool = False
+    created_at: datetime = datetime.now()
+    redemed_at: Optional[datetime] = None
+    # TODO: add validator for acvivate_user: value(user_name) can't be empty

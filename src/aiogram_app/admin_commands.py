@@ -17,7 +17,6 @@ from src.fastapi_app.auth import security
 @dp.message_handler(commands=["add_client"])
 async def add_client(
     message: types.Message,
-    *args,
 ):
     """"""
     vpn_client_name = message.get_args()
@@ -43,7 +42,6 @@ async def backup_clients(
 @dp.message_handler(commands=["disable_client"])
 async def disable_client(
     message: types.Message,
-    *args,
 ):
     """"""
     vpn_client_name = message.get_args()
@@ -58,7 +56,6 @@ async def disable_client(
 @dp.message_handler(commands=["enable_client"])
 async def enable_client(
     message: types.Message,
-    *args,
 ):
     """"""
     vpn_client_name = message.get_args()
@@ -102,7 +99,6 @@ async def get_all_users(
 @dp.message_handler(commands=["test_qr"])
 async def get_user(
     message: types.Message,
-    *args,
 ):
     """"""
     client_no = message.get_args()
@@ -132,7 +128,6 @@ async def speed_test(
 @dp.message_handler(commands=["create_payment"])
 async def create_payment(
     message: types.Message,
-    *args,
 ):
     """Makes a payment for a user"""
     if raw_args := message.get_args():
@@ -146,7 +141,7 @@ async def create_payment(
             Money(amount),
             user_name,
         )
-        if res:
+        if res.status_code == 200:
             await message.answer("Payment created")
         else:
             await message.answer("Payment not created")
@@ -155,7 +150,6 @@ async def create_payment(
 @dp.message_handler(commands=["create_invoice"])
 async def create_invoice(
     message: types.Message,
-    *args,
 ):
     """Manually create an invoice for user"""
     if raw_args := message.get_args():
@@ -165,11 +159,11 @@ async def create_invoice(
             return
         user_name, amount = args
 
-        res = await admin_routes.create_invoice(
+        response = await admin_routes.create_invoice(
             Money(amount),
             user_name,
         )
-        if res:
+        if response:
             await message.answer("Invoice created")
         else:
             await message.answer("Invoice not created")
