@@ -168,10 +168,10 @@ def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> Image.Image:
     qr_str = "".join(qr)
     colorText = "white"
     colorBackground = "black"
-    font = ImageFont.truetype("cour.ttf", size=12, encoding="unic")
-    # fontsize = 12 => width of char -> 7 height of char -> 14
-    width, height = (len(qr[0]) - 1) * 7, len(qr) * 14
-    img = Image.new("RGB", (width, height), colorBackground)
+    font = ImageFont.truetype("DejaVuSansMono.ttf", size=17, encoding="unic")
+    # fontsize = 17 => width of char -> 10 height of char -> 19.5
+    width, height = (len(qr[0]) - 1) * 10, len(qr) * 19.5
+    img = Image.new("RGB", (width, int(height)), colorBackground)
     d = ImageDraw.Draw(img)
     d.text((0, 0), qr_str, fill=colorText, font=font)
 
