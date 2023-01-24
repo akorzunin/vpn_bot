@@ -3,7 +3,7 @@ import uvicorn
 
 from src.logger import format as log_format, log_level
 
-log_config = uvicorn.config.LOGGING_CONFIG
+log_config = uvicorn.config.LOGGING_CONFIG  # type: ignore
 log_config["formatters"]["access"]["fmt"] = log_format
 uvicorn_conf = uvicorn.Config(
     loop="asyncio",
