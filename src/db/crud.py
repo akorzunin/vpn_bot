@@ -21,11 +21,11 @@ from src.tasks.task_configs import MAX_CONFIGS
 from src.fastapi_app import pivpn_wrapper as pivpn
 
 # asunc get user by id
-async def get_user_by_telegram_id(telegram_id: int) -> User | None:
+async def get_user_by_telegram_id(telegram_id: int) -> User:
     # get one user by id
     if user := users.get(where("telegram_id") == telegram_id):  # type: ignore
         return User(**user)
-    return None
+    raise ValueError("User not found")
 
 
 async def get_user_by_user_name(username: str) -> User | None:
