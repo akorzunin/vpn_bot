@@ -2,7 +2,8 @@
     Even if tinydb is not async functions is still coroutines
     in order to migrate to async db connector in future
 """
-from datetime import datetime
+from datetime import datetime, timezone
+import logging
 from uuid import uuid4
 from tinydb import Query, where
 
@@ -16,7 +17,8 @@ from src.db.schemas import (
     VpnPaymentId,
 )
 from src.utils.errors.config_errors import ConfigException
-
+from src.tasks.task_configs import MAX_CONFIGS
+from src.fastapi_app import pivpn_wrapper as pivpn
 
 # asunc get user by id
 async def get_user_by_telegram_id(telegram_id: int) -> User | None:
@@ -41,6 +43,10 @@ async def create_user(user) -> None:
 # get all users
 async def get_all_users():
     return users.all()
+
+
+async def get_all_enabled_users():
+    return users.search(where("is_enabled") == True)  # type: ignore
 
 
 # update user
@@ -70,8 +76,7 @@ def add_vpn_config(telegram_id: int, vpn_config: VpnConfig) -> None:
         old_vpn_configs = []
     old_vpn_configs.append(vpn_config.dict())
     assert isinstance(old_vpn_configs, list), "old_vpn_configs is not list"
-    # max configs limit is 3
-    if len(old_vpn_configs) > 3:
+    if len(old_vpn_configs) > MAX_CONFIGS:
         raise ConfigException("Max configs limit is 3")
     # configs w/ same user_nmae are not allowed
     if len({vpn_config["user_name"] for vpn_config in old_vpn_configs}) != len(
@@ -151,9 +156,58 @@ async def create_invoice(user_id: int, amount: Money):
     users.update(
         {
             "all_payments": user_payments,
-            "balance": user["balance"] - payment.amount,
+            "balance": user["balance"] - abs(payment.amount),
         },
         User.telegram_id == user_id,  # type: ignore
     )
     # insert payment
     payments.insert(payment.dict())
+
+
+async def update_user_next_payment(
+    user_id: int, next_payment: datetime
+) -> User:
+    users.update(
+        {"next_payment": next_payment},
+        where("telegram_id") == user_id,  # type: ignore
+    )
+    user = await get_user_by_telegram_id(user_id)
+    if user:
+        return user
+    raise ValueError("User not found")
+
+
+async def enable_user(user_id: int):
+    user = await get_user_by_telegram_id(user_id)
+    if user:
+        enable_all_user_configs(user)
+        users.update(
+            {
+                "is_enabled": True,
+                "next_payment": datetime.now(timezone.utc),
+            },
+            where("telegram_id") == user_id,  # type: ignore
+        )
+        logging.warning(f"User {user_id} enabled")
+
+
+def enable_all_user_configs(user):
+    if not user.conf_files:
+        raise ValueError("User has no configs")
+    for vpn_config in user.conf_files:
+        pivpn.enable_client(vpn_config)
+
+
+async def disable_user(user_id: int):
+    user = await get_user_by_telegram_id(user_id)
+    if user:
+        disable_all_user_configs(user)
+        users.update({"is_enabled": False}, where("telegram_id") == user_id)  # type: ignore
+        logging.warning(f"User {user_id} disabled")
+
+
+def disable_all_user_configs(user):
+    if not user.conf_files:
+        raise ValueError("User has no configs")
+    for vpn_config in user.conf_files:
+        pivpn.disable_client(vpn_config)

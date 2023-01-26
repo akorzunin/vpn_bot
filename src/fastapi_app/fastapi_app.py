@@ -10,6 +10,7 @@ from src.logger import format as log_format
 from src.tasks.scheduler import scheduler
 from src.fastapi_app.user_routes import router as user_router
 from src.fastapi_app.admin_routes import router as admin_router
+from src.tasks.user_tasks import recreate_user_billing_tasks
 
 app = FastAPI(
     # openapi_tags=tags_metadata,
@@ -27,45 +28,8 @@ async def startup_event():
     logger = logging.getLogger("uvicorn.access")
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(log_format))
+    # recreate all user billing tasks
+    await recreate_user_billing_tasks()
     # add logs to stdout
     logger.removeHandler(logger.handlers[0])
     logger.addHandler(handler)
-
-
-@app.get(
-    "/test",
-    response_model=shemas.Message,
-    status_code=status.HTTP_202_ACCEPTED,
-)
-async def test_endpoint(
-    message: str,
-):
-    def tick():
-        print(f"Tick! The time is: {datetime.now()}")
-        raise NotImplementedError
-
-    scheduler.add_job(tick, "interval", seconds=3, name="pepe")
-    return JSONResponse(
-        status_code=status.HTTP_202_ACCEPTED,
-        content=shemas.Message(message=message).dict(),
-    )
-
-
-@app.post(
-    "/create_task",
-    response_model=shemas.Message,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_task_endpoint(
-    task: shemas.Task,
-):
-
-    # test_task.count_words.send("http://google.com")
-    message = "Task created... i guess"
-    # scheduler.remove_job()
-    a = scheduler.get_jobs()
-    scheduler.remove_job(next(i.id for i in a if i.name == "pepe"))
-    return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
-        content=shemas.Message(message=message).dict(),
-    )

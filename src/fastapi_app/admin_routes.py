@@ -53,6 +53,26 @@ async def enable_client(client: str):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
+# TODO add diasble user
+
+
+@router.post("/enable_user/{user_id}")
+async def enable_user(user_id: int):
+    """enable user"""
+    try:
+        user = await crud.get_user_by_telegram_id(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        if user.is_enabled:
+            raise HTTPException(status_code=400, detail="User already enabled")
+        await crud.enable_user(user_id)
+        return JSONResponse(
+            status_code=200, content={"message": "User enabled"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
 @router.get("/list_clients")
 async def list_clients():
     """list clients"""
