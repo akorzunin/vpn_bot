@@ -40,6 +40,25 @@ async def create_user_billing_task(user: User) -> None:
     )
 
 
+def update_job(user: User):
+    """Update user billing task"""
+    # get user billing task
+    if task := scheduler.get_job(f"billing_{user.telegram_id}"):
+        logging.info(
+            f"Updating billing task for user {user.telegram_id} to {user.next_payment}"
+        )
+        task.next_run_time = user.next_payment
+        return
+    # update user billing task
+    scheduler.add_job(
+        billing_task,
+        "date",
+        run_date=user.next_payment,
+        id=f"billing_{user.telegram_id}",
+        args=[user.telegram_id],
+    )
+
+
 async def billing_task(telegram_id: int) -> None:
     """User billing task"""
     logging.info(f"billing_task for user {telegram_id}")
@@ -51,6 +70,7 @@ async def billing_task(telegram_id: int) -> None:
 
     if user.balance < PAYMENT_AMOUNT:
         await crud.disable_user(telegram_id)
+        return
 
     if user.is_enabled:
         if user.next_payment:
@@ -59,8 +79,7 @@ async def billing_task(telegram_id: int) -> None:
                 user.telegram_id,
                 get_next_payment_date(user.next_payment),
             )
-            # create new billing task
-            await create_user_billing_task(updated_user)
+            update_job(updated_user)
         else:
             # disable user if he is not intended to pay
             await crud.disable_user(telegram_id)

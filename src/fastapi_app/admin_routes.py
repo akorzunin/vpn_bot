@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from io import BytesIO
 import logging
 from typing import Literal
@@ -5,13 +6,15 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.security import HTTPBasicCredentials
-from src.db.schemas import Money, PromoCode, PromocodeId, User
+from src.db.schemas import Money, PromoCode, PromocodeId, User, UserUpdate
 
 # import pivpn_wrapper
 from src.fastapi_app import pivpn_wrapper as pivpn
 from src.fastapi_app.auth import check_credentials, security
 from src.db import crud
 from src.db import promocode_functions
+from src.tasks.task_configs import PAYMENT_AMOUNT
+from src.tasks.user_tasks import create_user_billing_task
 
 router = APIRouter()
 # TODO add authentication for admin routes
@@ -175,3 +178,41 @@ async def create_promocode(
         if data > 1:
             logging.warning(f"Promocode {promocode.id} already exists")
     return JSONResponse(status_code=200, content={"status": "ok"})
+
+
+@router.post("/hard_enable_user")
+async def hard_enable_user(
+    user_id: int,
+    balance: Money = PAYMENT_AMOUNT,
+    next_payment: datetime = datetime.now(timezone.utc),
+):
+    """hard enable user"""
+    try:
+        user = await crud.get_user_by_telegram_id(user_id)
+        if user.balance <= 0 or balance != PAYMENT_AMOUNT:
+            logging.warning(
+                f"User {user_id} balanse changed from {user.balance} to {balance}"
+            )
+            await crud.update_user(
+                user_id,
+                UserUpdate(balance=balance),
+            )
+        if not user.is_enabled:
+            logging.warning(f"User {user_id} enabled")
+            await crud.enable_user(user_id)
+        if user.next_payment is None or user.next_payment < datetime.now(
+            timezone.utc
+        ):
+            logging.warning(
+                f"User {user_id} next payment changed from {user.next_payment} to {next_payment}"
+            )
+            await crud.update_user(
+                user_id,
+                UserUpdate(next_payment=next_payment),
+            )
+        await create_user_billing_task(
+            await crud.get_user_by_telegram_id(user_id)
+        )
+        return JSONResponse(status_code=200, content={"status": "ok"})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e

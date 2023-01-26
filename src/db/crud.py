@@ -2,6 +2,8 @@
     Even if tinydb is not async functions is still coroutines
     in order to migrate to async db connector in future
 """
+
+import contextlib
 from datetime import datetime, timezone
 import logging
 from uuid import uuid4
@@ -19,6 +21,7 @@ from src.db.schemas import (
 from src.utils.errors.config_errors import ConfigException
 from src.tasks.task_configs import MAX_CONFIGS
 from src.fastapi_app import pivpn_wrapper as pivpn
+from src.utils.errors.pivpn_errors import UserAlreadyDisabledError
 
 # asunc get user by id
 async def get_user_by_telegram_id(telegram_id: int) -> User:
@@ -171,10 +174,7 @@ async def update_user_next_payment(
         {"next_payment": next_payment},
         where("telegram_id") == user_id,  # type: ignore
     )
-    user = await get_user_by_telegram_id(user_id)
-    if user:
-        return user
-    raise ValueError("User not found")
+    return await get_user_by_telegram_id(user_id)
 
 
 async def enable_user(user_id: int):
@@ -201,7 +201,8 @@ def enable_all_user_configs(user):
 async def disable_user(user_id: int):
     user = await get_user_by_telegram_id(user_id)
     if user:
-        disable_all_user_configs(user)
+        with contextlib.suppress(UserAlreadyDisabledError):
+            disable_all_user_configs(user)
         users.update({"is_enabled": False}, where("telegram_id") == user_id)  # type: ignore
         logging.warning(f"User {user_id} disabled")
 

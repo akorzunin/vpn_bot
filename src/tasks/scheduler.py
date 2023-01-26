@@ -20,7 +20,6 @@ scheduler = AsyncIOScheduler(
             NO_REVIVE_PERIOD.total_seconds()
         ),  # time to pick up missed job
     },
-    timezone=UTC,
 )
 
 
@@ -52,11 +51,7 @@ async def job_missed_listener(event):
 
 @call_coroutine
 async def job_removed_listener(event):
-    user_id = get_user_id_from_job_id(event.job_id)
-    user = await crud.get_user_by_telegram_id(user_id)
-    logging.warning(
-        f"Job {event.job_id} {user.balance} {user.next_payment} removed"
-    )
+    logging.info(f"Removed Job {event.job_id}")
 
 
 scheduler.add_listener(
