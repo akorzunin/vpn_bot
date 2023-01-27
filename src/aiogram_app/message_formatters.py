@@ -40,3 +40,16 @@ def format_many_vpn_configs(vpn_configs: list[tuple[str, str]]) -> str:
 def escape_markdown(text: str) -> str:
     """Helper function to escape telegram markup symbols"""
     return text.replace("_", "\\_")
+
+
+def format_param(param: dict):
+    """format param in human readable format"""
+    return f"{param['value']} {param['units']}"
+
+
+def format_speed_test_data(data: dict) -> str:
+    """format speed test data in human readable format"""
+    data_str = "Speed test data:"
+    for k, v in data.items():
+        data_str += f"\n  {k} {format_param(v)}"
+    return data_str

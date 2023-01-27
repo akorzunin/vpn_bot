@@ -6,7 +6,10 @@ from aiogram import types
 from fastapi.security import HTTPBasicCredentials
 
 from src.aiogram_app.aiogram_app import dp
-from src.aiogram_app.message_formatters import prepare_all_user_str
+from src.aiogram_app.message_formatters import (
+    format_speed_test_data,
+    prepare_all_user_str,
+)
 from src.aiogram_app.telegram_auth import login_admin
 from src.db.schemas import Money
 from src.fastapi_app import admin_routes
@@ -121,8 +124,9 @@ async def speed_test(
     message: types.Message,
 ):
     """"""
+    await message.answer("Running speed test...")
     data = await admin_routes.speed_test()
-    await message.answer(str(data))
+    await message.answer(format_speed_test_data(data))
 
 
 @dp.message_handler(commands=["create_payment"])
