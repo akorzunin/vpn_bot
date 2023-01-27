@@ -3,6 +3,7 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.utils.exceptions import TelegramAPIError
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import HTTPException
 
 API_TOKEN = os.getenv(
@@ -12,7 +13,7 @@ API_TOKEN = os.getenv(
 if not API_TOKEN:
     raise ValueError("TOKEN is not set in .env file")
 bot = Bot(API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())
 
 # register user_commands
 from src.aiogram_app import user_commands
@@ -22,6 +23,9 @@ from src.aiogram_app import baisic_commands
 
 # register admin commands
 from src.aiogram_app import admin_commands
+
+# register login commands
+from src.aiogram_app import login_commands
 
 
 @dp.errors_handler(
