@@ -23,11 +23,18 @@ from src.tasks.task_configs import MAX_CONFIGS
 from src.fastapi_app import pivpn_wrapper as pivpn
 from src.utils.errors.pivpn_errors import UserAlreadyDisabledError
 
-# asunc get user by id
-async def get_user_by_telegram_id(telegram_id: int) -> User:
-    # get one user by id
+
+async def find_user_by_telegram_id(telegram_id: int) -> User | None:
+    # get one user by id or return None
     if user := users.get(where("telegram_id") == telegram_id):  # type: ignore
         return User(**user)
+    return None
+
+
+async def get_user_by_telegram_id(telegram_id: int) -> User:
+    # get one user by id
+    if user := await find_user_by_telegram_id(telegram_id):
+        return user
     raise ValueError("User not found")
 
 

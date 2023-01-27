@@ -22,7 +22,7 @@ async def get_user_by_id(user_id: int):
 @router.post("/create_user")
 async def create_user(user: User):
     """create user"""
-    if await crud.get_user_by_telegram_id(user.telegram_id):
+    if await crud.find_user_by_telegram_id(user.telegram_id):
         # return 400
         return JSONResponse(status_code=400, content="User already exists")
     await crud.create_user(user)
