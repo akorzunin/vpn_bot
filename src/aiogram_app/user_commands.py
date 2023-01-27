@@ -18,7 +18,7 @@ from src.fastapi_app import pivpn_wrapper as pivpn
 async def t_me(message: types.Message):
     """get information about current user from db"""
     # get user info
-    user = await crud.get_user_by_telegram_id(message.from_user.id)
+    user = await crud.find_user_by_telegram_id(message.from_user.id)
     if not user:
         await message.answer(
             "User not found, u can create a new one with /start"
@@ -119,7 +119,7 @@ async def list_configs(message: types.Message):
 @dp.message_handler(commands=["balance", "get_balance"])
 async def get_balance(message: types.Message):
     """get balance of user"""
-    user = await crud.get_user_by_telegram_id(message.from_user.id)
+    user = await crud.find_user_by_telegram_id(message.from_user.id)
     if user:
         await message.answer(
             f"Balance: {user.balance}\nNext payment: {user.next_payment}"

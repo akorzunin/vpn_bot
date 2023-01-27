@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
+from fastapi import HTTPException
 
 from src.aiogram_app.aiogram_app import dp
 from src.db import crud
@@ -75,6 +76,32 @@ async def check_login_username(message: types.Message):
         await message.reply(
             f"User {user.user_name} already exists", reply=False
         )
+
+
+@dp.message_handler(state="LOGIN_CODE")
+async def check_login_code(message: types.Message):
+    user = await crud.find_user_by_telegram_id(message.from_user.id)
+    if user:
+        await message.answer(
+            f"You already have an account w/ username {user.user_name} "
+            "U can use ... commands"
+        )
+        await end_login_dialog(message)
+        return
+    code = message.text.strip()
+    try:
+        response = await user_routes.redeem_code(
+            message.from_user.id,
+            code_alias=code,
+        )
+        if response.status_code == 200:
+            await message.reply(
+                f"User linked with code {code} U can use ... commands",
+                reply=False,
+            )
+    except HTTPException as e:
+        await message.answer(e.detail)
+        await end_login_dialog(message)
 
 
 @dp.callback_query_handler(
