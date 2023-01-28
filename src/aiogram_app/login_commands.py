@@ -9,7 +9,7 @@ from src.fastapi_app import user_routes
 
 
 @dp.message_handler(commands=["start"])
-async def restart(message: types.Message):
+async def login_start(message: types.Message):
     builder = InlineKeyboardMarkup()
     builder.add(
         types.InlineKeyboardButton(
