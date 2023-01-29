@@ -1,6 +1,6 @@
 # project settings
 *.ipynb
-**/db.json
+**/*db.json
 **/nohup.out
 .idea/
 *.ttf

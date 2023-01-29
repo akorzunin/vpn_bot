@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get("/get_user/{user_id}")
 async def get_user_by_id(user_id: int):
-    user = await crud.get_user_by_telegram_id(user_id)
+    user = await crud.find_user_by_telegram_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -33,7 +33,7 @@ async def create_user(user: User):
 @router.put("/update_user/{user_id}")
 async def update_user(user_id: int, user: UserUpdate):
     """update user"""
-    if await crud.get_user_by_telegram_id(user_id):
+    if await crud.find_user_by_telegram_id(user_id):
         await crud.update_user(user_id, user)
         return JSONResponse(
             status_code=200, content={"message": "User updated"}
