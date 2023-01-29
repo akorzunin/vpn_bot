@@ -4,6 +4,7 @@ from datetime import datetime
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from src.fastapi_app import shemas
+from src.fastapi_app.pivpn_wrapper import check_pivpn_connection
 
 # from src.metadata import tags_metadata
 from src.logger import format as log_format
@@ -33,3 +34,4 @@ async def startup_event():
     # add logs to stdout
     logger.removeHandler(logger.handlers[0])
     logger.addHandler(handler)
+    logging.info(f"pivpn api connected: {check_pivpn_connection()}")

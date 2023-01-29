@@ -11,8 +11,19 @@ from src.utils.errors.pivpn_errors import (
     UserAlreadyExistsError,
     UserNotFoundError,
 )
+from src import PIVPN_HOST
 
-PIVPN_HOST = os.getenv("PIVPN_HOST", "192.168.1.132:7070")
+
+def check_pivpn_connection() -> bool:
+    """check connection to pivpn"""
+    try:
+        res = requests.get(f"http://{PIVPN_HOST}/whoami")
+        if res.status_code == 200 and res.text == '{"stdout":"root\\n"}':
+            return True
+        return False
+    except Exception as e:
+        return False
+
 
 pivpn_functions = getmembers(pivpn_app, isfunction)
 
