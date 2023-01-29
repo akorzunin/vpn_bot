@@ -9,10 +9,11 @@ from apscheduler.events import (
     EVENT_JOB_REMOVED,
 )
 
-from src.tasks.task_configs import NO_REVIVE_PERIOD
+from src import NO_REVIVE_PERIOD
 from src.db import crud
 
 scheduler = AsyncIOScheduler(
+    event_loop=asyncio.new_event_loop(),
     job_defaults={
         "coalesce": True,  # run job after its missed in down time
         "max_instances": 1,  # run only one instance of job
