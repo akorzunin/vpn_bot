@@ -1,26 +1,30 @@
 import asyncio
-from datetime import UTC
 import logging
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import UTC
+
 from apscheduler.events import (
-    EVENT_JOB_EXECUTED,
     EVENT_JOB_ERROR,
+    EVENT_JOB_EXECUTED,
     EVENT_JOB_MISSED,
     EVENT_JOB_REMOVED,
 )
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from src import NO_REVIVE_PERIOD
 from src.db import crud
+from src.loop import loop
+
+scheduler_config = {
+    "coalesce": True,  # run job after its missed in down time
+    "max_instances": 1,  # run only one instance of job
+    "misfire_grace_time": int(
+        NO_REVIVE_PERIOD.total_seconds()
+    ),  # time to pick up missed job
+}
 
 scheduler = AsyncIOScheduler(
-    event_loop=asyncio.new_event_loop(),
-    job_defaults={
-        "coalesce": True,  # run job after its missed in down time
-        "max_instances": 1,  # run only one instance of job
-        "misfire_grace_time": int(
-            NO_REVIVE_PERIOD.total_seconds()
-        ),  # time to pick up missed job
-    },
+    event_loop=loop,
+    job_defaults=scheduler_config,
 )
 
 

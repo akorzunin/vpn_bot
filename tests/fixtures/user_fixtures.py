@@ -1,6 +1,7 @@
 import pytest
-from src.db.schemas import User, UserUpdate
+
 from src.db import crud
+from src.db.schemas import User, UserUpdate
 
 # mock db
 from tests.fixtures.mock_db import replace_db
