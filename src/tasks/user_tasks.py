@@ -1,17 +1,17 @@
-from datetime import datetime, timedelta, timezone
 import logging
+from datetime import datetime, timedelta, timezone
 
 from src.db import crud
 from src.db.schemas import Money, User
 from src.tasks.scheduler import scheduler
 from src.tasks.task_configs import (
+    ALLOWED_DOWNTIME_DELAY,
     BILL_PERIOD,
     PAYMENT_AMOUNT,
-    ALLOWED_DOWNTIME_DELAY,
 )
 
 
-async def recreate_user_billing_tasks():
+async def recreate_user_billing_tasks(scheduler=scheduler):
     """Recreate all user billing tasks"""
     logging.info("Recreating user billing tasks")
     # get all users
@@ -21,15 +21,11 @@ async def recreate_user_billing_tasks():
     # recreate all user billing tasks
     for user in users:
         # create billing task
-        await create_user_billing_task(User(**user))
+        await create_user_billing_task(User(**user), scheduler)
 
 
-async def create_user_billing_task(user: User) -> None:
+async def create_user_billing_task(user: User, scheduler=scheduler) -> None:
     """Create user billing task"""
-    # get user billing task
-    if task := scheduler.get_job(f"billing_{user.telegram_id}"):
-        # remove old task
-        scheduler.remove_job(task.id)
     # create new task
     scheduler.add_job(
         billing_task,
@@ -37,10 +33,11 @@ async def create_user_billing_task(user: User) -> None:
         run_date=user.next_payment,
         id=f"billing_{user.telegram_id}",
         args=[user.telegram_id],
+        replace_existing=True,
     )
 
 
-def update_job(user: User):
+def update_job(user: User, scheduler=scheduler):
     """Update user billing task"""
     # get user billing task
     if task := scheduler.get_job(f"billing_{user.telegram_id}"):
