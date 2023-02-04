@@ -17,61 +17,61 @@ from src.db import crud
 from src.fastapi_app.auth import security
 
 
-@dp.message_handler(commands=["add_client"])
-async def add_client(
+@dp.message_handler(commands=["add_client", "add_vpn_config"])
+async def add_vpn_config(
     message: types.Message,
 ):
     """"""
-    vpn_client_name = message.get_args()
-    if not vpn_client_name:
-        await message.answer("Please provide client name")
+    vpn_config_name = message.get_args()
+    if not vpn_config_name:
+        await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.add_client(vpn_client_name)
+    data = await admin_routes.add_client(vpn_config_name)
 
     await message.answer(
-        f"Vpn client {vpn_client_name} created\n" f"Config path: {data}"
+        f"Vpn config {vpn_config_name} created\n" f"Config path: {data}"
     )
 
 
-@dp.message_handler(commands=["backup_clients"])
-async def backup_clients(
+@dp.message_handler(commands=["backup_vpn_data"])
+async def backup_vpn_data(
     message: types.Message,
 ):
     """"""
-    data = await admin_routes.backup_clients(login_admin(message.from_user.id))
+    data = await admin_routes.backup_vpn_data(login_admin(message.from_user.id))
     await message.answer(data)
 
 
-@dp.message_handler(commands=["disable_client"])
-async def disable_client(
+@dp.message_handler(commands=["disable_client", "disable_vpn_config"])
+async def disable_vpn_config(
     message: types.Message,
 ):
     """"""
-    vpn_client_name = message.get_args()
-    if not vpn_client_name:
-        await message.answer("Please provide client name")
+    vpn_config_name = message.get_args()
+    if not vpn_config_name:
+        await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.disable_client(vpn_client_name)
+    data = await admin_routes.disable_client(vpn_config_name)
 
-    await message.answer(f"Vpn client {vpn_client_name} disabled\n")
+    await message.answer(f"Vpn config {vpn_config_name} disabled\n")
 
 
-@dp.message_handler(commands=["enable_client"])
-async def enable_client(
+@dp.message_handler(commands=["enable_client", "enable_vpn_config"])
+async def enable_vpn_config(
     message: types.Message,
 ):
     """"""
-    vpn_client_name = message.get_args()
-    if not vpn_client_name:
-        await message.answer("Please provide client name")
+    vpn_config_name = message.get_args()
+    if not vpn_config_name:
+        await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.enable_client(vpn_client_name)
+    data = await admin_routes.enable_client(vpn_config_name)
 
-    await message.answer(f"Vpn client {vpn_client_name} enabled\n")
+    await message.answer(f"Vpn config {vpn_config_name} enabled\n")
 
 
-@dp.message_handler(commands=["list_clients"])
-async def list_clients(
+@dp.message_handler(commands=["list_clients", "list_pivpn_users"])
+async def list_pivpn_users(
     message: types.Message,
 ):
     """"""
@@ -98,15 +98,14 @@ async def get_all_users(
     await message.answer(prepare_all_user_str(data))
 
 
-# get_user command
 @dp.message_handler(commands=["test_qr"])
-async def get_user(
+async def test_qr(
     message: types.Message,
 ):
     """"""
     client_no = message.get_args()
     if not client_no:
-        await message.answer("Please provide client name")
+        await message.answer("Please provide vpn config name")
         return
     try:
         data = await admin_routes.get_user_qr(client_no)
@@ -115,7 +114,7 @@ async def get_user(
         return
     await message.answer_photo(
         data.body_iterator,
-        caption=f"QR code for client {client_no}",
+        caption=f"QR code for vpn config {client_no}",
     )
 
 
@@ -137,7 +136,7 @@ async def create_payment(
     if raw_args := message.get_args():
         args = raw_args.split()
         if len(args) != 2:
-            await message.answer("Please provide client name and amount")
+            await message.answer("Please provide user name and amount")
             return
         user_name, amount = args
 
@@ -159,7 +158,7 @@ async def create_invoice(
     if raw_args := message.get_args():
         args = raw_args.split()
         if len(args) != 2:
-            await message.answer("Please provide client name and amount")
+            await message.answer("Please provide user name and amount")
             return
         user_name, amount = args
 

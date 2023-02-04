@@ -1,10 +1,9 @@
 """fastapi router for user routes"""
 from uuid import UUID
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-
-from src.db import crud
-from src.db import promocode_functions
+from src.db import crud, promocode_functions
 from src.db.schemas import User, UserUpdate, VpnConfig
 from src.fastapi_app import pivpn_wrapper as pivpn
 
@@ -60,7 +59,7 @@ async def delete_user(telegram_id: int):
 
 @router.post("/add_vpn_config/{user_id}")
 async def add_vpn_config(user_id: int, vpn_config: VpnConfig):
-    """add vpn config"""
+    """add given vpn config to user by its telegram_id"""
     if await crud.get_user_by_telegram_id(user_id):
         try:
             crud.add_vpn_config(user_id, vpn_config)

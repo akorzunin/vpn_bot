@@ -30,7 +30,7 @@ async def add_client(client: str):
 
 
 @router.post("/backup_clients")
-async def backup_clients(
+async def backup_vpn_data(
     credentials: HTTPBasicCredentials = Depends(security),
 ):
     """backup clients"""
