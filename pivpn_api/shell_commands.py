@@ -2,9 +2,27 @@ import subprocess
 from typing import Sequence, Union
 
 
+def run_pipe_shell_command(command: Sequence[str]) -> Union[str, Exception]:
+    try:
+        result = subprocess.run(
+            f'echo "{" ".join(command)}" > /pipes/pivpn_pipe && cat /pipes/pivpn_out',
+            stdout=subprocess.PIPE,
+            timeout=10,
+            shell=True,
+        )
+    except subprocess.TimeoutExpired as e:
+        return e
+    except Exception as e:
+        return e
+    return result.stdout.decode("utf-8")
+
+
 def run_shell_command(command: Sequence[str]) -> Union[str, Exception]:
     try:
-        result = subprocess.run(command, stdout=subprocess.PIPE)
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+        )
     except Exception as e:
         return e
     return result.stdout.decode("utf-8")

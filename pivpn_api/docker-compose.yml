@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  pivpn_api:
+    image: pivpn_api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 10002:7070
+    restart: unless-stopped
+    volumes:
+      - ./pipes:/pipes:rw
