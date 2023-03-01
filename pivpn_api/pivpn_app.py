@@ -3,12 +3,14 @@
 import subprocess
 from typing import Literal
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.security import HTTPBasicCredentials
 
 try:
-    from pivpn_api import shell_commands
+    from pivpn_api import auth, shell_commands
 except ImportError:
+    import auth
     import shell_commands
 
 app = FastAPI()
@@ -23,9 +25,18 @@ def handle_exeption(result: Exception) -> JSONResponse:
     return JSONResponse(status_code=400, content={"stdout": str(result)})
 
 
+@app.get(
+    "/",
+    include_in_schema=False,
+)
+async def docs_redirect():
+    return RedirectResponse(url="/docs")
+
+
 @app.get("/whoami")
-async def whoami():
+async def whoami(credentials: HTTPBasicCredentials = Depends(auth.security)):
     """get the name of the user who called the command"""
+    auth.check_credentials(credentials)
     result = shell_commands.run_pipe_shell_command(shell_commands.whoami)
     if isinstance(result, Exception):
         return handle_exeption(result)
@@ -33,7 +44,9 @@ async def whoami():
 
 
 @app.get("/get_all_clients")
-async def get_all_clients():
+async def get_all_clients(
+    credentials: HTTPBasicCredentials = Depends(auth.security),
+):
     """get all the clients from the server"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.get_all_clients
@@ -44,7 +57,9 @@ async def get_all_clients():
 
 
 @app.post("/add_client")
-async def add_client(user_name: str):
+async def add_client(
+    user_name: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
     """add a new client to the server"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.add_client + [user_name]
@@ -55,7 +70,9 @@ async def add_client(user_name: str):
 
 
 @app.get("/qr_client")
-async def qr_client(user_name: str):
+async def qr_client(
+    user_name: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
     """get the qr code for a client"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.qr_client + [user_name]
@@ -66,7 +83,9 @@ async def qr_client(user_name: str):
 
 
 @app.post("/disable_client")
-async def disable_client(user_name: str):
+async def disable_client(
+    user_name: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
     """disable a client"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.disable_client + [user_name]
@@ -77,7 +96,9 @@ async def disable_client(user_name: str):
 
 
 @app.post("/enable_client")
-async def enable_client(user_name: str):
+async def enable_client(
+    user_name: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
     """enable a client"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.enable_client + [user_name]
@@ -87,8 +108,23 @@ async def enable_client(user_name: str):
     return {"stdout": result}
 
 
+@app.delete("/delete_client")
+async def delete_client(
+    user_name: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
+    """delete a client"""
+    result = shell_commands.run_pipe_shell_command(
+        shell_commands.delete_client + [user_name]
+    )
+    if isinstance(result, Exception):
+        return handle_exeption(result)
+    return {"stdout": result}
+
+
 @app.get("/list_clients")
-async def list_clients():
+async def list_clients(
+    credentials: HTTPBasicCredentials = Depends(auth.security),
+):
     """list all the clients"""
     result = shell_commands.run_pipe_shell_command(shell_commands.list_clients)
     if isinstance(result, Exception):
@@ -97,7 +133,9 @@ async def list_clients():
 
 
 @app.post("/backup_clients")
-async def backup_clients():
+async def backup_clients(
+    credentials: HTTPBasicCredentials = Depends(auth.security),
+):
     """backup all the clients"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.backup_clients
@@ -122,7 +160,9 @@ async def speed_test(type: Literal["full", ""] = ""):
 
 
 @app.get("/get_config_by_filepath")
-async def get_config_by_filepath(filepath: str):
+async def get_config_by_filepath(
+    filepath: str, credentials: HTTPBasicCredentials = Depends(auth.security)
+):
     """get the config file by filepath"""
     result = shell_commands.run_pipe_shell_command(
         shell_commands.get_config_by_filepath + [filepath]

@@ -60,6 +60,13 @@ enable_client = [
     "-y",
 ]  # prompt for client number
 
+
+delete_client = [
+    "pivpn",
+    "-r",
+    "-y",
+]
+
 list_clients = [
     "pivpn",
     "-l",
