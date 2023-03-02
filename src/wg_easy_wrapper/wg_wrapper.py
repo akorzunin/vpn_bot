@@ -7,22 +7,24 @@ from src import WG_HOST, WG_PASSWORD
 
 
 def get_cookies() -> RequestsCookieJar:
-    payload = {
-        "password": WG_PASSWORD,
-    }
-    headers = {"Content-Type": "application/json"}
+    raise NotImplementedError
 
-    response = requests.request(
-        "POST",
-        f"{WG_HOST}/session",
-        json=payload,
-        headers=headers,
-    )
-    if response.status_code == 204:
-        return response.cookies
-    raise WGWrapperError(
-        f"Failed to get cookies {response.status_code} {response.text}"
-    )
+    # payload = {
+    #     "password": WG_PASSWORD,
+    # }
+    # headers = {"Content-Type": "application/json"}
+
+    # response = requests.request(
+    #     "POST",
+    #     f"http://{WG_HOST}/session",
+    #     json=payload,
+    #     headers=headers,
+    # )
+    # if response.status_code == 204:
+    #     return response.cookies
+    # raise WGWrapperError(
+    #     f"Failed to get cookies {response.status_code} {response.text}"
+    # )
 
 
 def get_cookies_decorator(func):
