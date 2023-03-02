@@ -11,16 +11,20 @@ from src.utils.errors.pivpn_errors import (
     UserAlreadyExistsError,
     UserNotFoundError,
 )
-from src import PIVPN_HOST
+from src import PIVPN_HOST, PIVPN_TOKEN
 
 
 def check_pivpn_connection() -> bool:
     """check connection to pivpn"""
     try:
-        res = requests.get(f"http://{PIVPN_HOST}/whoami")
-        if res.status_code == 200 and res.text == '{"stdout":"root\\n"}':
-            return True
-        return False
+        res = requests.get(
+            f"http://{PIVPN_HOST}/whoami",
+            headers={
+                "Accept": "application/json",
+                "Authorization": f"Basic {PIVPN_TOKEN}",
+            },
+        )
+        return res.status_code == 200 and res.text == '{"stdout":"root\\n"}'
     except Exception as e:
         return False
 
@@ -35,9 +39,11 @@ parse_line = lambda line: re.split(r"\s{2,}", strip_ansi_codes(line))
 
 
 def parse_col(columns, line):
-    if not columns:
-        return {"line": line, "error": "No columns defined"}
-    return dict(zip(columns, parse_line(line)))
+    return (
+        dict(zip(columns, parse_line(line)))
+        if columns
+        else {"line": line, "error": "No columns defined"}
+    )
 
 
 def parse_table(

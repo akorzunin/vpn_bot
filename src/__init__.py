@@ -8,6 +8,7 @@ load_dotenv()
 DEBUG = bool(eval(os.getenv("DEBUG", "False")))
 PROTECT_DOCS = bool(eval(os.getenv("PROTECT_DOCS", "False")))
 PIVPN_HOST = os.getenv("PIVPN_HOST", "localhost:7070")
+PIVPN_TOKEN = os.getenv("PIVPN_TOKEN", "")
 WG_HOST = os.getenv("WG_HOST", "localhost:7998")
 WG_PASSWORD = os.getenv("WG_PASSWORD", "password")
 

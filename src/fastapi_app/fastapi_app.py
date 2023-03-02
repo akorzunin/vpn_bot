@@ -3,7 +3,6 @@ from datetime import datetime
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
-from src.fastapi_app import shemas
 from src.fastapi_app.pivpn_wrapper import check_pivpn_connection
 
 # from src.metadata import tags_metadata
