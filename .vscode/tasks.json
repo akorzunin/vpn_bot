@@ -1,32 +1,36 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "docker-build",
-            "label": "docker-build",
-            "platform": "python",
-            "dockerBuild": {
-                "tag": "vpnbot:latest",
-                "dockerfile": "${workspaceFolder}/Dockerfile",
-                "context": "${workspaceFolder}",
-                "pull": true
-            }
-        },
-        {
-            "type": "docker-run",
-            "label": "docker-run: debug",
-            "dependsOn": [
-                "docker-build"
-            ],
-            "python": {
-                "file": "main.py"
-            }
-        },
-        {
-            "detail": "export poetry dependencies to pip reqirements file",
-            "label": "poetry export",
-            "type": "shell",
-            "command": "poetry export -f requirements.txt --output requirements.txt --without-hashes"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "docker-build",
+      "label": "docker-build",
+      "platform": "python",
+      "dockerBuild": {
+        "tag": "vpnbot:latest",
+        "dockerfile": "${workspaceFolder}/Dockerfile",
+        "context": "${workspaceFolder}",
+        "pull": true
+      }
+    },
+    {
+      "type": "docker-run",
+      "label": "docker-run: debug",
+      "dependsOn": ["docker-build"],
+      "python": {
+        "file": "main.py"
+      }
+    },
+    {
+      "detail": "export poetry dependencies to pip reqirements file",
+      "label": "poetry export",
+      "type": "shell",
+      "command": "poetry export -f requirements.txt --output requirements.txt --without-hashes"
+    },
+    {
+      "label": "pytest",
+      "detail": "run pytest in poetry venv",
+      "type": "shell",
+      "command": "poetry run pytest"
+    }
+  ]
 }
