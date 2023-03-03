@@ -1,4 +1,5 @@
 import asyncio
+from typing import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 
@@ -31,6 +32,9 @@ def event_loop():
 class TestUsers:
     def __getitem__(self, key):
         return self.__getattribute__(key)
+
+    def __iter__(self) -> Iterator[tuple[str, User]]:
+        return iter(self.__dict__.items())
 
     async def create_users(self):
         self.new_user = await upsert_user(

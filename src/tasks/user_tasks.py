@@ -32,7 +32,7 @@ async def create_user_billing_task(user: User, scheduler=scheduler) -> None:
         "date",
         run_date=user.next_payment,
         id=f"billing_{user.telegram_id}",
-        args=[user.telegram_id],
+        args=[user.telegram_id, scheduler],
         replace_existing=True,
     )
 
@@ -52,11 +52,11 @@ def update_job(user: User, scheduler=scheduler):
         "date",
         run_date=user.next_payment,
         id=f"billing_{user.telegram_id}",
-        args=[user.telegram_id],
+        args=[user.telegram_id, scheduler],
     )
 
 
-async def billing_task(telegram_id: int) -> None:
+async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
     """User billing task"""
     logging.info(f"billing_task for user {telegram_id}")
     # get user
@@ -76,7 +76,7 @@ async def billing_task(telegram_id: int) -> None:
                 user.telegram_id,
                 get_next_payment_date(user.next_payment),
             )
-            update_job(updated_user)
+            update_job(updated_user, scheduler)
         else:
             # disable user if he is not intended to pay
             await crud.disable_user(telegram_id)

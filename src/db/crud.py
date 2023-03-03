@@ -214,8 +214,10 @@ async def disable_user(user_id: int):
         logging.warning(f"User {user_id} disabled")
 
 
-def disable_all_user_configs(user):
+def disable_all_user_configs(user: User):
     if not user.conf_files:
-        raise ValueError("User has no configs")
+        logging.warning(f"User {user.telegram_id} has no configs")
+        return
+        # raise ValueError("User has no configs")
     for vpn_config in user.conf_files:
         pivpn.disable_client(vpn_config)

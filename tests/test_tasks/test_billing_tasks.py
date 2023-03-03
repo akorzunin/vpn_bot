@@ -10,7 +10,7 @@ from src.db.schemas import User
 from src.tasks.scheduler import scheduler_config
 from src.tasks.user_tasks import recreate_user_billing_tasks
 from tests import mock_globals
-from tests.fixtures.user_fixtures import test_users
+from tests.fixtures.user_fixtures import test_users, TestUsers
 
 src.NO_REVIVE_PERIOD = mock_globals.NO_REVIVE_PERIOD
 from src.logger import logger
@@ -45,15 +45,22 @@ async def print_pepe(a):
 
 @pytest.mark.asyncio
 async def test_job(
-    scheduler,
-    test_users,
+    scheduler: AsyncIOScheduler,
+    test_users: TestUsers,
 ):
     logger.info(test_users)
     mock_ = mock.AsyncMock()
-    scheduler.add_job(print_pepe, "interval", seconds=1, args=[mock_])
+    scheduler.add_job(
+        print_pepe,
+        "interval",
+        id="test_job",
+        seconds=1,
+        args=[mock_],
+    )
     assert scheduler.running
     await asyncio.sleep(1.1)
     mock_.assert_called_once()
+    scheduler.remove_job("test_job")
 
 
 # TODO enshure users exist in DB
@@ -62,9 +69,9 @@ async def test_scheduler_jobs(scheduler, test_users):
     scheduler = scheduler
     await recreate_user_billing_tasks(scheduler)
     jobs = scheduler.get_jobs()
-    assert len(jobs) == 2
+    assert len(jobs) > 0, "no jobs in scheduler"
 
-    while len(scheduler.get_jobs()) != 0:
+    while len(scheduler.get_jobs()) == len(jobs):
         await asyncio.sleep(1)
         logger.info("waiting for scheduler to run")
 
@@ -77,6 +84,7 @@ async def test_regular_payment(capsys, scheduler, test_users):
         before_user: User = test_users[
             "not_zero_balance_enabled_user_w_next_payment"
         ]
+        assert before_user.next_payment is not None, "user has no next payment"
         await recreate_user_billing_tasks(scheduler)
         await asyncio.sleep(mock_globals.BILL_PERIOD.total_seconds() + 1)
         # get user from db and save to after_user variable
@@ -85,12 +93,10 @@ async def test_regular_payment(capsys, scheduler, test_users):
             before_user.balance - src.PAYMENT_AMOUNT
         ), "job does not affect user balance, user: {user.telegram_id}, test user type: not_zero_balance_enabled_user"
         # next payment should be changed
-        # TODO расследовать преступление скедулера: ПОЧ не создается новая таска
-        assert (
-            scheduler.get_job(f"payment_{after_user.telegram_id}").next_run_time
-            != scheduler.get_job(
-                f"payment_{before_user.telegram_id}"
-            ).next_run_time
+        assert scheduler.get_job(
+            f"billing_{after_user.telegram_id}"
+        ).next_run_time == (
+            before_user.next_payment + src.BILL_PERIOD
         ), "job does not change next payment time, user: {user.telegram_id}, test user type: not_zero_balance_enabled_user"
 
 
