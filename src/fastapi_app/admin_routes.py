@@ -13,7 +13,7 @@ from src.fastapi_app import pivpn_wrapper as pivpn
 from src.fastapi_app.auth import check_credentials, security
 from src.db import crud
 from src.db import promocode_functions
-from src.tasks.task_configs import PAYMENT_AMOUNT
+from src import PAYMENT_AMOUNT
 from src.tasks.user_tasks import create_user_billing_task
 
 router = APIRouter()

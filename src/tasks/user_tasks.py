@@ -1,14 +1,10 @@
 import logging
 from datetime import datetime, timedelta, timezone
 
+import src
 from src.db import crud
 from src.db.schemas import Money, User
 from src.tasks.scheduler import scheduler
-from src.tasks.task_configs import (
-    ALLOWED_DOWNTIME_DELAY,
-    BILL_PERIOD,
-    PAYMENT_AMOUNT,
-)
 
 
 async def recreate_user_billing_tasks(scheduler=scheduler):
@@ -65,13 +61,13 @@ async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
         logging.error(f"User not found {telegram_id} terminated billing task")
         raise ValueError("User not found")
 
-    if user.balance < PAYMENT_AMOUNT:
+    if user.balance < src.PAYMENT_AMOUNT:
         await crud.disable_user(telegram_id)
         return
 
     if user.is_enabled:
         if user.next_payment:
-            await crud.create_invoice(telegram_id, PAYMENT_AMOUNT)
+            await crud.create_invoice(telegram_id, src.PAYMENT_AMOUNT)
             updated_user = await crud.update_user_next_payment(
                 user.telegram_id,
                 get_next_payment_date(user.next_payment),
@@ -84,6 +80,9 @@ async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
 
 def get_next_payment_date(user_next_payment: datetime) -> datetime:
     """Get next payment date"""
-    if user_next_payment < datetime.now(timezone.utc) - ALLOWED_DOWNTIME_DELAY:
-        return datetime.now(timezone.utc) + BILL_PERIOD
-    return user_next_payment + BILL_PERIOD
+    if (
+        user_next_payment
+        < datetime.now(timezone.utc) - src.ALLOWED_DOWNTIME_DELAY
+    ):
+        return datetime.now(timezone.utc) + src.BILL_PERIOD
+    return user_next_payment + src.BILL_PERIOD

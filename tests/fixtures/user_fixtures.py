@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+import src
 from src.db import crud
 from src.db.schemas import User, UserUpdate
 
@@ -37,11 +38,12 @@ class TestUsers:
         return iter(self.__dict__.items())
 
     async def create_users(self):
+        user_id = iter(range(1, 100))
         self.new_user = await upsert_user(
             User(
                 **{
                     "user_name": "test_new_user",
-                    "telegram_id": 1,
+                    "telegram_id": next(user_id),
                     "is_enabled": False,
                 }
             )
@@ -50,7 +52,7 @@ class TestUsers:
             User(
                 **{
                     "user_name": "test_no_balance_enabled_user",
-                    "telegram_id": 2,
+                    "telegram_id": next(user_id),
                     "is_enabled": True,
                 }
             )
@@ -59,7 +61,7 @@ class TestUsers:
             User(
                 **{
                     "user_name": "test_no_balance_disabled_user",
-                    "telegram_id": 3,
+                    "telegram_id": next(user_id),
                     "is_enabled": False,
                 }
             )
@@ -68,7 +70,7 @@ class TestUsers:
             User(
                 **{
                     "user_name": "test_not_zero_balance_enabled_user",
-                    "telegram_id": 4,
+                    "telegram_id": next(user_id),
                     "is_enabled": True,
                     "balance": 100_000,
                 }
@@ -78,7 +80,7 @@ class TestUsers:
             User(
                 **{
                     "user_name": "test_not_zero_balance_disabled_user",
-                    "telegram_id": 5,
+                    "telegram_id": next(user_id),
                     "is_enabled": False,
                     "balance": 100_000,
                 }
@@ -88,11 +90,23 @@ class TestUsers:
             User(
                 **{
                     "user_name": "test_not_zero_balance_enabled_user_w_next_payment",
-                    "telegram_id": 6,
+                    "telegram_id": next(user_id),
                     "is_enabled": True,
                     "balance": 100_000,
                     "next_payment": datetime.now(timezone.utc)
-                    + timedelta(seconds=1),
+                    + src.BILL_PERIOD,
+                }
+            )
+        )
+        self.one_paymanet_balance_enabled_user_w_next_payment = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_one_paymanet_balance_enabled_user_w_next_payment",
+                    "telegram_id": next(user_id),
+                    "is_enabled": True,
+                    "balance": src.PAYMENT_AMOUNT,
+                    "next_payment": datetime.now(timezone.utc)
+                    + src.BILL_PERIOD,
                 }
             )
         )

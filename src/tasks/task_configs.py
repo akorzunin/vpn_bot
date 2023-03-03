@@ -1,3 +1,4 @@
+"""Don't import env variables directly, use src module instead"""
 from datetime import timedelta
 import os
 

@@ -19,14 +19,14 @@ from src.db.schemas import (
     VpnPaymentId,
 )
 from src.utils.errors.config_errors import ConfigException
-from src.tasks.task_configs import MAX_CONFIGS
+from src import MAX_CONFIGS
 from src.fastapi_app import pivpn_wrapper as pivpn
 from src.utils.errors.pivpn_errors import UserAlreadyDisabledError
 
 
 async def find_user_by_telegram_id(telegram_id: int) -> User | None:
     # get one user by id or return None
-    if user := users.get(where("telegram_id") == telegram_id):  # type: ignore
+    if user := users.get(where("telegram_id") == telegram_id):
         return User(**user)
     return None
 
@@ -40,7 +40,7 @@ async def get_user_by_telegram_id(telegram_id: int) -> User:
 
 async def get_user_by_user_name(username: str) -> User | None:
     # get one user by id
-    if user := users.get(where("user_name") == username):  # type: ignore
+    if user := users.get(where("user_name") == username):
         return User(**user)
     return None
 
@@ -56,7 +56,7 @@ async def get_all_users():
 
 
 async def get_all_enabled_users():
-    return users.search(where("is_enabled") == True)  # type: ignore
+    return users.search(where("is_enabled") == True)
 
 
 # update user
@@ -68,7 +68,7 @@ async def update_user(telegram_id: int, user: UserUpdate) -> None:
 
     users.update(
         user_new_values,
-        User.telegram_id == telegram_id,  # type: ignore
+        User.telegram_id == telegram_id,
     )
 
 
@@ -95,14 +95,16 @@ def add_vpn_config(telegram_id: int, vpn_config: VpnConfig) -> None:
         raise ConfigException("Config with same user_name already exists")
     users.update(
         {"conf_files": old_vpn_configs},
-        User.telegram_id == telegram_id,  # type: ignore
+        User.telegram_id == telegram_id,
     )
 
 
 def remove_vpn_config(telegram_id: int, vpn_user: str) -> None:
     User = Query()
     # get old vpn configs list from user
-    old_vpn_configs: list = users.get(User.telegram_id == telegram_id)["conf_files"]  # type: ignore
+    old_vpn_configs: list = users.get(User.telegram_id == telegram_id)[  # type: ignore
+        "conf_files"
+    ]
     # remove vpn config from list
     vpn_configs = [
         vpn_config
@@ -111,7 +113,7 @@ def remove_vpn_config(telegram_id: int, vpn_user: str) -> None:
     ]
     users.update(
         {"conf_files": vpn_configs},
-        User.telegram_id == telegram_id,  # type: ignore
+        User.telegram_id == telegram_id,
     )
 
 
@@ -127,7 +129,7 @@ async def create_payment(user_id: int, amount: Money):
 
     User = Query()
     # get all payments
-    user = users.get(User.telegram_id == user_id)  # type: ignore
+    user = users.get(User.telegram_id == user_id)
     if not user:
         raise ValueError("User not found")
     user_payments = user["all_payments"]
@@ -137,7 +139,7 @@ async def create_payment(user_id: int, amount: Money):
     user_payments.append(payment_id)
     users.update(
         {"all_payments": user_payments, "balance": user["balance"] + amount},
-        User.telegram_id == user_id,  # type: ignore
+        User.telegram_id == user_id,
     )
     # insert payment
     payments.insert(payment.dict())
@@ -155,7 +157,7 @@ async def create_invoice(user_id: int, amount: Money):
 
     User = Query()
     # get all payments
-    user = users.get(User.telegram_id == user_id)  # type: ignore
+    user = users.get(User.telegram_id == user_id)
     if not user:
         raise ValueError("User not found")
     user_payments = user["all_payments"]
@@ -168,7 +170,7 @@ async def create_invoice(user_id: int, amount: Money):
             "all_payments": user_payments,
             "balance": user["balance"] - abs(payment.amount),
         },
-        User.telegram_id == user_id,  # type: ignore
+        User.telegram_id == user_id,
     )
     # insert payment
     payments.insert(payment.dict())
@@ -179,7 +181,7 @@ async def update_user_next_payment(
 ) -> User:
     users.update(
         {"next_payment": next_payment},
-        where("telegram_id") == user_id,  # type: ignore
+        where("telegram_id") == user_id,
     )
     return await get_user_by_telegram_id(user_id)
 
@@ -193,7 +195,7 @@ async def enable_user(user_id: int):
                 "is_enabled": True,
                 "next_payment": datetime.now(timezone.utc),
             },
-            where("telegram_id") == user_id,  # type: ignore
+            where("telegram_id") == user_id,
         )
         logging.warning(f"User {user_id} enabled")
 
@@ -210,7 +212,7 @@ async def disable_user(user_id: int):
     if user:
         with contextlib.suppress(UserAlreadyDisabledError):
             disable_all_user_configs(user)
-        users.update({"is_enabled": False}, where("telegram_id") == user_id)  # type: ignore
+        users.update({"is_enabled": False}, where("telegram_id") == user_id)
         logging.warning(f"User {user_id} disabled")
 
 
