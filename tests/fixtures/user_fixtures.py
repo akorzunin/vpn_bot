@@ -1,3 +1,7 @@
+import asyncio
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from src.db import crud
@@ -17,62 +21,81 @@ async def upsert_user(user: User) -> User:
     return await crud.get_user_by_telegram_id(user.telegram_id)
 
 
+@pytest.fixture(scope="module")
+def event_loop():
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
+class TestUsers:
+    def __getitem__(self, key):
+        return self.__getattribute__(key)
+
+    async def create_users(self):
+        self.new_user = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_new_user",
+                    "telegram_id": 1,
+                    "is_enabled": False,
+                }
+            )
+        )
+        self.no_balance_enabled_user = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_no_balance_enabled_user",
+                    "telegram_id": 2,
+                    "is_enabled": True,
+                }
+            )
+        )
+        self.no_balance_disabled_user = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_no_balance_disabled_user",
+                    "telegram_id": 3,
+                    "is_enabled": False,
+                }
+            )
+        )
+        self.not_zero_balance_enabled_user = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_not_zero_balance_enabled_user",
+                    "telegram_id": 4,
+                    "is_enabled": True,
+                    "balance": 100_000,
+                }
+            )
+        )
+        self.not_zero_balance_disabled_user = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_not_zero_balance_disabled_user",
+                    "telegram_id": 5,
+                    "is_enabled": False,
+                    "balance": 100_000,
+                }
+            )
+        )
+        self.not_zero_balance_enabled_user_w_next_payment = await upsert_user(
+            User(
+                **{
+                    "user_name": "test_not_zero_balance_enabled_user_w_next_payment",
+                    "telegram_id": 6,
+                    "is_enabled": True,
+                    "balance": 100_000,
+                    "next_payment": datetime.now(timezone.utc)
+                    + timedelta(seconds=1),
+                }
+            )
+        )
+        return self
+
+
 @pytest.mark.asyncio
 @pytest.fixture(scope="module")
 async def test_users():
-    # create test users
-    new_user = await upsert_user(
-        User(
-            **{
-                "user_name": "test_new_user",
-                "telegram_id": 1,
-                "is_enabled": False,
-            }
-        )
-    )
-    no_balance_enabled_user = await upsert_user(
-        User(
-            **{
-                "user_name": "test_no_balance_enabled_user",
-                "telegram_id": 2,
-                "is_enabled": True,
-            }
-        )
-    )
-    no_balance_disabled_user = await upsert_user(
-        User(
-            **{
-                "user_name": "test_no_balance_disabled_user",
-                "telegram_id": 3,
-                "is_enabled": False,
-            }
-        )
-    )
-    not_zero_balance_enabled_user = await upsert_user(
-        User(
-            **{
-                "user_name": "test_not_zero_balance_enabled_user",
-                "telegram_id": 4,
-                "is_enabled": True,
-                "balance": 100_000,
-            }
-        )
-    )
-    not_zero_balance_disabled_user = await upsert_user(
-        User(
-            **{
-                "user_name": "test_not_zero_balance_disabled_user",
-                "telegram_id": 5,
-                "is_enabled": False,
-                "balance": 100_000,
-            }
-        )
-    )
-
-    return dict(
-        new_user=new_user,
-        no_balance_enabled_user=no_balance_enabled_user,
-        no_balance_disabled_user=no_balance_disabled_user,
-        not_zero_balance_enabled_user=not_zero_balance_enabled_user,
-        not_zero_balance_disabled_user=not_zero_balance_disabled_user,
-    )
+    return await TestUsers().create_users()
