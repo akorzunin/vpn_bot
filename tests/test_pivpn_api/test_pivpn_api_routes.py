@@ -4,13 +4,9 @@ import pytest
 import requests
 
 from src import PIVPN_HOST, PIVPN_TOKEN
+from src.fastapi_app.pivpn_wrapper import pivpn_headers
 
 RANDOM_VPN_CLIENT_NAMES = True
-
-pivpn_headers = {
-    "Accept": "application/json",
-    "Authorization": f"Basic {PIVPN_TOKEN}",
-}
 
 
 @dataclass
