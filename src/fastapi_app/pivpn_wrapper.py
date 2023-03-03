@@ -13,16 +13,18 @@ from src.utils.errors.pivpn_errors import (
 )
 from src import PIVPN_HOST, PIVPN_TOKEN
 
+pivpn_headers = {
+    "Accept": "application/json",
+    "Authorization": f"Basic {PIVPN_TOKEN}",
+}
+
 
 def check_pivpn_connection() -> bool:
     """check connection to pivpn"""
     try:
         res = requests.get(
             f"http://{PIVPN_HOST}/whoami",
-            headers={
-                "Accept": "application/json",
-                "Authorization": f"Basic {PIVPN_TOKEN}",
-            },
+            headers=pivpn_headers,
         )
         return res.status_code == 200 and res.text == '{"stdout":"root\\n"}'
     except Exception as e:
@@ -87,7 +89,12 @@ def api_call(
     # check if function exists in pivpn_functions
     if pivpn_func not in [i[0] for i in pivpn_functions]:
         raise ValueError(f"Function {pivpn_func} not found in pivpn_api")
-    r = requests.request(method, f"http://{host}/{pivpn_func}", params=params)
+    r = requests.request(
+        method,
+        f"http://{host}/{pivpn_func}",
+        params=params,
+        headers=pivpn_headers,
+    )
     # check response status code
     if r.status_code != 200:
         raise ValueError(f"Error in API call: {r.status_code} {r.reason}")
