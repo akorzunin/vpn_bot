@@ -1,3 +1,4 @@
+import asyncio
 import json
 import pytest
 from httpx import AsyncClient
@@ -9,7 +10,7 @@ from src import PROTECT_DOCS
 # mock db
 from tests.fixtures.mock_db import replace_db
 
-from tests.fixtures.user_fixtures import test_users
+from tests.fixtures.user_fixtures import test_users, event_loop
 
 from src.db import crud
 
@@ -27,8 +28,8 @@ async def test_docs_access():
 
 
 @pytest.mark.asyncio
-async def test_get_user(test_users):
-    test_users_data: dict[str, User] = await test_users
+async def test_get_user(event_loop, test_users):
+    test_users_data = test_users
     for usre_label, user in test_users_data.items():
         async with AsyncClient(app=app, base_url="http://test") as ac:
             response = await ac.get(f"/user/get_user/{user.telegram_id}")
