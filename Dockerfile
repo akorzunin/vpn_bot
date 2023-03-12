@@ -10,7 +10,7 @@ ENV PYTHONFAULTHANDLER=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    POETRY_VERSION=1.2.0 
+    POETRY_VERSION=1.3.2 
 
 WORKDIR /app
 
@@ -24,9 +24,9 @@ COPY poetry.lock pyproject.toml /app/
 ARG DEBUG=${DEBUG}
 RUN if [ "${DEBUG}" != "True" ] ; then \
     poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --without dev; \
+    && poetry install --no-interaction --no-ansi --without dev,test; \
     else poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi  --with dev; fi
+    && poetry install --no-interaction --no-ansi  --with dev,test; fi
 
 COPY . /app
 
