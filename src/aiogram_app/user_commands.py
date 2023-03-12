@@ -72,7 +72,7 @@ async def add_config(message: types.Message):
         await message.answer("Please provide config user name")
         return
 
-    file_path = await admin_routes.add_client(user_name)
+    file_path = await admin_routes.add_vpn_config(user_name)
     # get config from pivpn_api
     data = await user_routes.get_vpn_config(file_path)
 

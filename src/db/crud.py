@@ -204,7 +204,7 @@ def enable_all_user_configs(user):
     if not user.conf_files:
         raise ValueError("User has no configs")
     for vpn_config in user.conf_files:
-        pivpn.enable_client(vpn_config)
+        pivpn.enable_vpn_config(vpn_config)
 
 
 async def disable_user(user_id: int):
@@ -222,4 +222,4 @@ def disable_all_user_configs(user: User):
         return
         # raise ValueError("User has no configs")
     for vpn_config in user.conf_files:
-        pivpn.disable_client(vpn_config)
+        pivpn.disable_vpn_config(vpn_config)

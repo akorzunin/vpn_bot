@@ -26,7 +26,7 @@ async def add_vpn_config(
     if not vpn_config_name:
         await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.add_client(vpn_config_name)
+    data = await admin_routes.add_vpn_config(vpn_config_name)
 
     await message.answer(
         f"Vpn config {vpn_config_name} created\n" f"Config path: {data}"
@@ -51,7 +51,7 @@ async def disable_vpn_config(
     if not vpn_config_name:
         await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.disable_client(vpn_config_name)
+    data = await admin_routes.disable_vpn_config(vpn_config_name)
 
     await message.answer(f"Vpn config {vpn_config_name} disabled\n")
 
@@ -65,7 +65,7 @@ async def enable_vpn_config(
     if not vpn_config_name:
         await message.answer("Please provide vpn config name")
         return
-    data = await admin_routes.enable_client(vpn_config_name)
+    data = await admin_routes.enable_vpn_config(vpn_config_name)
 
     await message.answer(f"Vpn config {vpn_config_name} enabled\n")
 
@@ -75,7 +75,7 @@ async def list_pivpn_users(
     message: types.Message,
 ):
     """"""
-    data = await admin_routes.list_clients()
+    data = await admin_routes.list_vpn_configs()
     await message.answer(str(data))
 
 
@@ -102,19 +102,19 @@ async def get_all_users(
 async def test_qr(
     message: types.Message,
 ):
-    """"""
-    client_no = message.get_args()
-    if not client_no:
+    """Test qr code generation"""
+    vpn_config = message.get_args()
+    if not vpn_config:
         await message.answer("Please provide vpn config name")
         return
     try:
-        data = await admin_routes.get_user_qr(client_no)
+        data = await admin_routes.get_vpn_config_qr(vpn_config)
     except ValueError as e:
         await message.answer(str(e))
         return
     await message.answer_photo(
         data.body_iterator,
-        caption=f"QR code for vpn config {client_no}",
+        caption=f"QR code for vpn config {vpn_config}",
     )
 
 

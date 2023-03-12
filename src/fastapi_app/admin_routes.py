@@ -20,38 +20,38 @@ router = APIRouter()
 # TODO add authentication for admin routes
 
 
-@router.post("/add_client/{client}")
-async def add_client(client: str):
-    """add client"""
+@router.post("/add_vpn_config/{vpn_config}")
+async def add_vpn_config(vpn_config: str):
+    """add vpn_config"""
     try:
-        return pivpn.add_client(client)
+        return pivpn.add_vpn_config(vpn_config)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@router.post("/backup_clients")
+@router.post("/backup_vpn_configs")
 async def backup_vpn_data(
     credentials: HTTPBasicCredentials = Depends(security),
 ):
-    """backup clients"""
+    """backup vpn_configs"""
     check_credentials(credentials)
-    return pivpn.backup_clients()
+    return pivpn.backup_vpn_configs()
 
 
-@router.post("/disable_client/{client}")
-async def disable_client(client: str):
-    """disable client"""
+@router.post("/disable_vpn_config/{vpn_config}")
+async def disable_vpn_config(vpn_config: str):
+    """disable vpn_config"""
     try:
-        return pivpn.disable_client(client)
+        return pivpn.disable_vpn_config(vpn_config)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@router.post("/enable_client/{client}")
-async def enable_client(client: str):
-    """enable client"""
+@router.post("/enable_vpn_config/{vpn_config}")
+async def enable_vpn_config(vpn_config: str):
+    """enable vpn_config"""
     try:
-        return pivpn.enable_client(client)
+        return pivpn.enable_vpn_config(vpn_config)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
@@ -76,10 +76,10 @@ async def enable_user(user_id: int):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@router.get("/list_clients")
-async def list_clients():
-    """list clients"""
-    return pivpn.list_clients()
+@router.get("/list_vpn_configs")
+async def list_vpn_configs():
+    """list vpn_configs"""
+    return pivpn.list_vpn_configs()
 
 
 @router.get("/pivpn_user")
@@ -94,10 +94,10 @@ async def get_all_users():
     return pivpn.get_all_users()
 
 
-@router.get("/get_user_qr/{client}")
-async def get_user_qr(client: str):
-    """get user qr"""
-    data = pivpn.get_qr_client(client)
+@router.get("/get_vpn_config_qr/{vpn_config}")
+async def get_vpn_config_qr(vpn_config: str):
+    """get vpn_config qr"""
+    data = pivpn.get_vpn_config_qr(vpn_config)
     bio = BytesIO()
     bio.name = "image.jpeg"
     data.save(bio, "JPEG")

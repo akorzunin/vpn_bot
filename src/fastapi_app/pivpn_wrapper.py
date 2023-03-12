@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from inspect import getmembers, isfunction
 
 from pivpn_api import pivpn_app
+from src.db.schemas import VpnConfig
 from src.utils.errors.pivpn_errors import (
     UserAlreadyDisabledError,
     UserAlreadyExistsError,
@@ -101,13 +102,13 @@ def api_call(
     return r.json()["stdout"]
 
 
-def add_client(client: str, host: str = PIVPN_HOST) -> str:
+def add_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
     data = api_call(
-        "post", "add_client", params={"user_name": client}, host=host
+        "post", "add_client", params={"user_name": vpn_config}, host=host
     )
     # parse data
     if not data:
-        raise UserAlreadyExistsError(f"Client already exists: {client}")
+        raise UserAlreadyExistsError(f"vpn_config already exists: {vpn_config}")
     success = filename = path = None
     for line in data.splitlines():
         if "Done!" in line:
@@ -120,11 +121,11 @@ def add_client(client: str, host: str = PIVPN_HOST) -> str:
                 if "/home" in word:
                     path = word
     if not success or not filename or not path:
-        raise ValueError(f"Failed to parse client data: {client}")
+        raise ValueError(f"Failed to parse vpn_config data: {vpn_config}")
     return f"{path}/{filename}"
 
 
-def backup_clients(host: str = PIVPN_HOST) -> str:
+def backup_vpn_configs(host: str = PIVPN_HOST) -> str:
     data = api_call("post", "backup_clients", host=host)
     path = None
     for line in data.splitlines():
@@ -137,39 +138,46 @@ def backup_clients(host: str = PIVPN_HOST) -> str:
     return path
 
 
-def disable_client(client: str, host: str = PIVPN_HOST) -> str:
+def disable_vpn_config(vpn_config: VpnConfig, host: str = PIVPN_HOST) -> str:
     data = api_call(
-        "post", "disable_client", params={"user_name": client}, host=host
+        "post",
+        "disable_client",
+        params={"user_name": vpn_config.user_name},
+        host=host,
     )
     for line in data.splitlines():
         if "::: Successfully disabled" in line:
             break
     else:
         if "not exist" in data:
-            raise UserNotFoundError(f"Client does not exist: {client}")
+            raise UserNotFoundError(f"vpn_config does not exist: {vpn_config}")
         if "already disabled" in data:
-            raise UserAlreadyDisabledError(f"Client already disabled: {client}")
-        raise ValueError(f"Failed to disable client: {client}")
-    return client
+            raise UserAlreadyDisabledError(
+                f"vpn_config already disabled: {vpn_config}"
+            )
+        raise ValueError(f"Failed to disable vpn_config: {vpn_config}")
+    return vpn_config.user_name
 
 
-def enable_client(client: str, host: str = PIVPN_HOST) -> str:
+def enable_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
     data = api_call(
-        "post", "enable_client", params={"user_name": client}, host=host
+        "post", "enable_client", params={"user_name": vpn_config}, host=host
     )
     for line in data.splitlines():
         if "::: Successfully enabled" in line:
             break
     else:
         if "not exist" in data:
-            raise UserNotFoundError(f"Client does not exist: {client}")
+            raise UserNotFoundError(f"vpn_config does not exist: {vpn_config}")
         if "already disabled" in data:
-            raise UserAlreadyDisabledError(f"Client already disabled: {client}")
-        raise ValueError(f"Failed to enable client: {client}")
-    return client
+            raise UserAlreadyDisabledError(
+                f"vpn_config already disabled: {vpn_config}"
+            )
+        raise ValueError(f"Failed to enable vpn_config: {vpn_config}")
+    return vpn_config
 
 
-def list_clients(host: str = PIVPN_HOST) -> dict:
+def list_vpn_configs(host: str = PIVPN_HOST) -> dict:
     data = api_call("get", "list_clients", host=host)
     return parse_table(data)
 
@@ -179,8 +187,12 @@ def whoami(host: str = PIVPN_HOST) -> str:
     return data.splitlines()[0]
 
 
-def get_qr_client(client: int | str, host: str = PIVPN_HOST) -> Image.Image:
-    data = api_call("get", "qr_client", params={"user_name": client}, host=host)
+def get_vpn_config_qr(
+    vpn_config: int | str, host: str = PIVPN_HOST
+) -> Image.Image:
+    data = api_call(
+        "get", "qr_client", params={"user_name": vpn_config}, host=host
+    )
     # parse response
     qr = [
         i[3:] + "\n"
