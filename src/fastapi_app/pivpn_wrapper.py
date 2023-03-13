@@ -239,7 +239,7 @@ def get_speed_test(
     else:
         # parse data output for --simple flag
         for line in data.splitlines():
-            if "Ping:" or "Download:" or "Upload:" in line:
+            if any(x in line for x in ["Ping:", "Download:", "Upload:"]):
                 name, value, units = line.split()
                 speed_data[name] = {"value": value, "units": units}
     return speed_data
