@@ -6,9 +6,7 @@ from aiogram.utils.exceptions import TelegramAPIError
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import HTTPException
 
-API_TOKEN = os.getenv(
-    "TOKEN",
-)
+API_TOKEN = os.getenv("TOKEN")
 # check if token exist else rise error
 if not API_TOKEN:
     raise ValueError("TOKEN is not set in .env file")

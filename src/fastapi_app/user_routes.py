@@ -91,7 +91,7 @@ async def get_vpn_config(file_path: str):
         raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@router.get("/redeem_code")
+@router.post("/redeem_code")
 async def redeem_code(
     user_id: int,
     code_alias: str = "",
