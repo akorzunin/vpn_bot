@@ -6,7 +6,14 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.security import HTTPBasicCredentials
-from src.db.schemas import Money, PromoCode, PromocodeId, User, UserUpdate
+from src.db.schemas import (
+    Money,
+    PromoCode,
+    PromocodeId,
+    User,
+    UserUpdate,
+    VpnConfig,
+)
 
 # import pivpn_wrapper
 from src.fastapi_app import pivpn_wrapper as pivpn
@@ -42,7 +49,9 @@ async def backup_vpn_data(
 async def disable_vpn_config(vpn_config: str):
     """disable vpn_config"""
     try:
-        return pivpn.disable_vpn_config(vpn_config)
+        return pivpn.disable_vpn_config(
+            VpnConfig(user_name=vpn_config, path="")
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
