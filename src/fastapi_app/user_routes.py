@@ -86,7 +86,7 @@ async def add_vpn_config(
 ):
     """add given vpn config to user by its telegram_id"""
     check_credentials(credentials)
-    if await crud.get_user_by_telegram_id(user_id):
+    if await crud.find_user_by_telegram_id(user_id):
         try:
             crud.add_vpn_config(user_id, vpn_config)
         except Exception as e:

@@ -107,7 +107,7 @@ def add_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
         "post", "add_client", params={"user_name": vpn_config}, host=host
     )
     # parse data
-    if not data:
+    if not data or "already exists" in data:
         raise UserAlreadyExistsError(f"vpn_config already exists: {vpn_config}")
     success = filename = path = None
     for line in data.splitlines():

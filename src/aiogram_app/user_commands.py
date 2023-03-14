@@ -8,6 +8,7 @@ from src.aiogram_app.message_formatters import (
     format_vpn_config,
     prepare_user_str,
 )
+from src.aiogram_app.telegram_auth import api_credentials
 from src.db import crud
 from src.db.schemas import VpnConfig
 from src.fastapi_app import user_routes, admin_routes
@@ -34,7 +35,10 @@ async def delete_user(message: types.Message):
     """delete user from db"""
     # TODO prompt for confirmation
     # call fastapi to delete user
-    response = await user_routes.delete_user(message.from_user.id)
+    response = await user_routes.delete_user(
+        message.from_user.id,
+        api_credentials,
+    )
     if response.status_code == 400:
         await message.answer(
             "User not found, u can create a new one with /start"
@@ -54,7 +58,9 @@ async def remove_config(message: types.Message):
         return
     # call fastapi to delete user
     response = await user_routes.remove_vpn_config(
-        message.from_user.id, user_name
+        message.from_user.id,
+        user_name,
+        api_credentials,
     )
     if response.status_code == 400:
         await message.answer("User not found")
@@ -74,7 +80,7 @@ async def add_config(message: types.Message):
 
     file_path = await admin_routes.add_vpn_config(user_name)
     # get config from pivpn_api
-    data = await user_routes.get_vpn_config(file_path)
+    data = await user_routes.get_vpn_config(file_path, api_credentials)
 
     vpn_config = VpnConfig(
         path=file_path,
@@ -82,7 +88,9 @@ async def add_config(message: types.Message):
     )
     # call fastapi to delete user
     response = await user_routes.add_vpn_config(
-        message.from_user.id, vpn_config
+        message.from_user.id,
+        vpn_config,
+        api_credentials,
     )
     if response.status_code == 400:
         await message.answer("User not found")
@@ -97,7 +105,10 @@ async def add_config(message: types.Message):
 async def list_configs(message: types.Message):
     """list vpn configs of user"""
     # get user from fastapi
-    user = await user_routes.get_user_by_id(message.from_user.id)
+    user = await user_routes.get_user_by_id(
+        message.from_user.id,
+        api_credentials,
+    )
     if not user:
         await message.answer("User not found")
         return
@@ -106,7 +117,13 @@ async def list_configs(message: types.Message):
         return
     # conf_files paths from user object
     conf_data: list[tuple[str, str]] = [
-        (await user_routes.get_vpn_config(conf.path), conf.user_name)
+        (
+            await user_routes.get_vpn_config(
+                conf.path,
+                api_credentials,
+            ),
+            conf.user_name,
+        )
         for conf in user.conf_files
     ]
 
@@ -135,7 +152,11 @@ async def redeem_code(message: types.Message):
     if not code:
         await message.answer("Please provide code")
         return
-    response = await user_routes.redeem_code(message.from_user.id, code)
+    response = await user_routes.redeem_code(
+        message.from_user.id,
+        code,
+        credentials=api_credentials,
+    )
     if response.status_code == 400:
         await message.answer("User not found")
     elif response.status_code == 200:
