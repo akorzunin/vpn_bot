@@ -79,7 +79,22 @@ async def test_get_all_users(event_loop):
         assert response.status_code == 200, "Failed get all users request"
 
 
-@pytest.mark.order(99)
+@pytest.mark.order(4)
+@pytest.mark.asyncio
+async def test_update_user(event_loop, semi_random_user: User):
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.put(
+            f"/user/update_user/{semi_random_user.telegram_id}",
+            json=json.loads(semi_random_user.json()),
+            headers=api_headers,
+        )
+        assert response.status_code == 200, "Failed update user request"
+        assert response.json() == {
+            "message": "User updated"
+        }, "Failed update user request"
+
+
+@pytest.mark.order(5)
 @pytest.mark.asyncio
 async def test_delete_user(event_loop, semi_random_user: User):
     async with AsyncClient(app=app, base_url="http://test") as ac:
