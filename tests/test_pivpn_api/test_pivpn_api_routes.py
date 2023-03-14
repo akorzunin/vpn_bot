@@ -1,25 +1,9 @@
-import uuid
-from dataclasses import dataclass, field
 import pytest
 import requests
 
 from src import PIVPN_HOST, PIVPN_TOKEN
 from src.fastapi_app.pivpn_wrapper import pivpn_headers
-
-RANDOM_VPN_CLIENT_NAMES = True
-
-
-@dataclass
-class Name:
-    static_name: str = "test_client"
-    random_name: str = field(
-        default_factory=lambda: f"{str(uuid.uuid4())[:8]}_test_client"
-    )
-
-
-@pytest.fixture(scope="session")
-def name():
-    return Name()
+from tests.fixtures.user_fixtures import Name, name, RANDOM_VPN_CLIENT_NAMES
 
 
 def get_all_clients():

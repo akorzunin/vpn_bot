@@ -1,5 +1,6 @@
 import asyncio
 import json
+import random
 import pytest
 from httpx import AsyncClient
 
@@ -10,7 +11,12 @@ from src import PROTECT_DOCS
 # mock db
 from tests.fixtures.mock_db import replace_db
 
-from tests.fixtures.user_fixtures import test_users, event_loop, TestUsers
+from tests.fixtures.user_fixtures import (
+    test_users,
+    event_loop,
+    semi_random_user,
+    TestUsers,
+)
 
 
 from src.db import crud
@@ -28,14 +34,49 @@ async def test_docs_access():
         assert response.status_code == 401
 
 
+@pytest.mark.order(1)
 @pytest.mark.asyncio
-async def test_get_user(event_loop, test_users: TestUsers):
-    for usre_label, user in test_users:
-        async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.get(f"/user/get_user/{user.telegram_id}")
-            assert (
-                response.status_code == 200
-            ), f"Failed get request for user{usre_label}"
-            assert response.json() == json.loads(
-                user.json()
-            ), f"Failed get data for user{usre_label}"
+async def test_create_user(event_loop, semi_random_user: User):
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.post(
+            "/user/create_user",
+            json=json.loads(semi_random_user.json()),
+        )
+        assert response.status_code == 201, "Failed create user request"
+        assert response.json() == {
+            "message": "User created"
+        }, "Failed create user request"
+        assert await crud.find_user_by_telegram_id(
+            semi_random_user.telegram_id
+        ), "User was not created"
+
+
+@pytest.mark.order(2)
+@pytest.mark.asyncio
+async def test_get_user(event_loop, semi_random_user: User):
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get(
+            f"/user/get_user/{semi_random_user.telegram_id}"
+        )
+        assert (
+            response.status_code == 200
+        ), f"Failed get request for user {semi_random_user.user_name}"
+        assert response.json() == json.loads(
+            semi_random_user.json()
+        ), f"Failed get data for user {semi_random_user.user_name}"
+
+
+@pytest.mark.order(99)
+@pytest.mark.asyncio
+async def test_delete_user(event_loop, semi_random_user: User):
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.delete(
+            f"/user/delete_user/{semi_random_user.telegram_id}"
+        )
+        assert response.status_code == 200, "Failed delete user request"
+        assert response.json() == {
+            "message": "User deleted"
+        }, "Failed delete user request"
+        assert not await crud.find_user_by_telegram_id(
+            semi_random_user.telegram_id
+        ), "User was not deleted"

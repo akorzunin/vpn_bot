@@ -47,12 +47,12 @@ async def get_all_users():
 
 
 # delete user
-@router.delete("/delete_user/{user_id}")
+@router.delete("/delete_user/{telegram_id}")
 async def delete_user(telegram_id: int):
     """delete user"""
-    user = await crud.get_user_by_telegram_id(telegram_id)
+    user = await crud.find_user_by_telegram_id(telegram_id)
     if not user:
-        return JSONResponse(status_code=400, content="User not found")
+        return JSONResponse(status_code=404, content="User not found")
     await crud.delete_user(user)
     return JSONResponse(status_code=200, content={"message": "User deleted"})
 

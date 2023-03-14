@@ -2,6 +2,7 @@ import asyncio
 from typing import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+import uuid
 
 import pytest
 
@@ -13,6 +14,21 @@ from src.db.schemas import User, UserUpdate
 from tests.fixtures.mock_db import replace_db
 
 replace_db(crud)
+
+RANDOM_VPN_CLIENT_NAMES = False
+
+
+@dataclass
+class Name:
+    static_name: str = "test_client"
+    random_name: str = field(
+        default_factory=lambda: f"{str(uuid.uuid4())[:8]}_test_client"
+    )
+
+
+@pytest.fixture(scope="session")
+def name():
+    return Name()
 
 
 async def upsert_user(user: User) -> User:
@@ -117,3 +133,18 @@ class TestUsers:
 @pytest.fixture(scope="module")
 async def test_users():
     return await TestUsers().create_users()
+
+
+@pytest.mark.asyncio
+@pytest.fixture(scope="module")
+async def semi_random_user():
+    """Returns a user with random name and telegram_id for full test cyccle
+    But can be defined stictly for a sengle test case run"""
+    return User(
+        user_name=Name().random_name
+        if RANDOM_VPN_CLIENT_NAMES
+        else Name().static_name,
+        telegram_id=int("".join(filter(str.isdigit, Name().random_name)))
+        if RANDOM_VPN_CLIENT_NAMES
+        else 123456,  # telegram id as only digits from random_name
+    )
