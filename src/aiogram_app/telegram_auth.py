@@ -16,3 +16,9 @@ def login_admin(user_id: int):
         username=os.getenv("API_LOGIN", "admin"),
         password=os.getenv("API_PASSWORD", "admin"),
     )
+
+
+api_credentials = HTTPBasicCredentials(
+    username=os.getenv("API_LOGIN", "admin"),
+    password=os.getenv("API_PASSWORD", "admin"),
+)

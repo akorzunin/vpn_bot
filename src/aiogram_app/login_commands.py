@@ -6,6 +6,7 @@ from src.aiogram_app.aiogram_app import dp
 from src.db import crud
 from src.db.schemas import User
 from src.fastapi_app import user_routes
+from src.aiogram_app.telegram_auth import api_credentials
 
 
 @dp.message_handler(commands=["start"])
@@ -64,7 +65,7 @@ async def check_login_username(message: types.Message):
         telegram_id=message.from_user.id,
         user_name=user_name,
     )
-    response = await user_routes.create_user(user)
+    response = await user_routes.create_user(user, api_credentials)
     # if response is success send user message that he is created
     if response.status_code == 201:
         await message.reply(
@@ -93,6 +94,7 @@ async def check_login_code(message: types.Message):
         response = await user_routes.redeem_code(
             message.from_user.id,
             code_alias=code,
+            credentials=api_credentials,
         )
         if response.status_code == 200:
             await message.reply(

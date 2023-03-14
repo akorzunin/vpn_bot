@@ -17,7 +17,7 @@ from tests.fixtures.user_fixtures import (
     semi_random_user,
     TestUsers,
 )
-
+from tests.test_fastapi import api_headers
 
 from src.db import crud
 
@@ -41,6 +41,7 @@ async def test_create_user(event_loop, semi_random_user: User):
         response = await ac.post(
             "/user/create_user",
             json=json.loads(semi_random_user.json()),
+            headers=api_headers,
         )
         assert response.status_code == 201, "Failed create user request"
         assert response.json() == {
@@ -56,7 +57,8 @@ async def test_create_user(event_loop, semi_random_user: User):
 async def test_get_user(event_loop, semi_random_user: User):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.get(
-            f"/user/get_user/{semi_random_user.telegram_id}"
+            f"/user/get_user/{semi_random_user.telegram_id}",
+            headers=api_headers,
         )
         assert (
             response.status_code == 200
@@ -66,12 +68,24 @@ async def test_get_user(event_loop, semi_random_user: User):
         ), f"Failed get data for user {semi_random_user.user_name}"
 
 
+@pytest.mark.order(3)
+@pytest.mark.asyncio
+async def test_get_all_users(event_loop):
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        response = await ac.get(
+            "/user/get_all_users",
+            headers=api_headers,
+        )
+        assert response.status_code == 200, "Failed get all users request"
+
+
 @pytest.mark.order(99)
 @pytest.mark.asyncio
 async def test_delete_user(event_loop, semi_random_user: User):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.delete(
-            f"/user/delete_user/{semi_random_user.telegram_id}"
+            f"/user/delete_user/{semi_random_user.telegram_id}",
+            headers=api_headers,
         )
         assert response.status_code == 200, "Failed delete user request"
         assert response.json() == {
