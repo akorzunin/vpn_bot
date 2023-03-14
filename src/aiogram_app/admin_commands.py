@@ -17,8 +17,8 @@ from src.db import crud
 from src.fastapi_app.auth import security
 
 
-@dp.message_handler(commands=["add_client", "add_vpn_config"])
-async def add_vpn_config(
+@dp.message_handler(commands=["add_client", "create_vpn_config"])
+async def create_vpn_config(
     message: types.Message,
 ):
     """"""

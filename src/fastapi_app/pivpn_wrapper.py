@@ -102,13 +102,19 @@ def api_call(
     return r.json()["stdout"]
 
 
-def add_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
+def add_vpn_config(vpn_config_name: str, host: str = PIVPN_HOST) -> str:
     data = api_call(
-        "post", "add_client", params={"user_name": vpn_config}, host=host
+        "post", "add_client", params={"user_name": vpn_config_name}, host=host
     )
     # parse data
     if not data or "already exists" in data:
-        raise UserAlreadyExistsError(f"vpn_config already exists: {vpn_config}")
+        raise UserAlreadyExistsError(
+            f"vpn_config already exists: {vpn_config_name}"
+        )
+    if "Name can only contain alphanumeric characters" in data:
+        raise ValueError(
+            "Name can only contain alphanumeric characters and these symbols (.-@_)."
+        )
     success = filename = path = None
     for line in data.splitlines():
         if "Done!" in line:
@@ -121,7 +127,7 @@ def add_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
                 if "/home" in word:
                     path = word
     if not success or not filename or not path:
-        raise ValueError(f"Failed to parse vpn_config data: {vpn_config}")
+        raise ValueError(f"Failed to parse vpn_config data: {vpn_config_name}")
     return f"{path}/{filename}"
 
 
