@@ -123,9 +123,9 @@ async def speed_test(
     message: types.Message,
 ):
     """"""
-    await message.answer("Running speed test...")
+    answer_message = await message.answer("Running speed test...")
     data = await admin_routes.speed_test()
-    await message.answer(format_speed_test_data(data))
+    await answer_message.edit_text(format_speed_test_data(data))
 
 
 @dp.message_handler(commands=["create_payment"])
