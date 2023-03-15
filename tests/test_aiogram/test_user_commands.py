@@ -1,3 +1,4 @@
+from asyncio import AbstractEventLoop
 import pytest
 from aiogram import types
 from unittest import mock
@@ -10,7 +11,9 @@ from src.db import crud
 
 @pytest.mark.order(1)
 @pytest.mark.asyncio
-async def test_user_command(event_loop, test_users: TestUsers):
+async def test_user_command(
+    event_loop: AbstractEventLoop, test_users: TestUsers
+):
     message = types.Message()
     message.from_user = mock.AsyncMock()
     message.answer = mock.AsyncMock()
@@ -24,7 +27,9 @@ async def test_user_command(event_loop, test_users: TestUsers):
 
 @pytest.mark.order(99)
 @pytest.mark.asyncio
-async def test_delete_user(event_loop, test_users: TestUsers):
+async def test_delete_user(
+    event_loop: AbstractEventLoop, test_users: TestUsers
+):
     message = types.Message()
     message.from_user = mock.AsyncMock()
     message.answer = mock.AsyncMock()
@@ -41,7 +46,9 @@ async def test_delete_user(event_loop, test_users: TestUsers):
 
 @pytest.mark.order(2)
 @pytest.mark.asyncio
-async def test_get_balance(event_loop, test_users: TestUsers):
+async def test_get_balance(
+    event_loop: AbstractEventLoop, test_users: TestUsers
+):
     message = types.Message()
     message.from_user = mock.AsyncMock()
     message.answer = mock.AsyncMock()

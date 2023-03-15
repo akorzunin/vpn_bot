@@ -36,7 +36,9 @@ async def test_docs_access():
 
 @pytest.mark.order(1)
 @pytest.mark.asyncio
-async def test_create_user(event_loop, semi_random_user: User):
+async def test_create_user(
+    event_loop: asyncio.AbstractEventLoop, semi_random_user: User
+):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.post(
             "/user/create_user",
@@ -54,7 +56,9 @@ async def test_create_user(event_loop, semi_random_user: User):
 
 @pytest.mark.order(2)
 @pytest.mark.asyncio
-async def test_get_user(event_loop, semi_random_user: User):
+async def test_get_user(
+    event_loop: asyncio.AbstractEventLoop, semi_random_user: User
+):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.get(
             f"/user/get_user/{semi_random_user.telegram_id}",
@@ -70,7 +74,7 @@ async def test_get_user(event_loop, semi_random_user: User):
 
 @pytest.mark.order(3)
 @pytest.mark.asyncio
-async def test_get_all_users(event_loop):
+async def test_get_all_users(event_loop: asyncio.AbstractEventLoop):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.get(
             "/user/get_all_users",
@@ -81,7 +85,9 @@ async def test_get_all_users(event_loop):
 
 @pytest.mark.order(4)
 @pytest.mark.asyncio
-async def test_update_user(event_loop, semi_random_user: User):
+async def test_update_user(
+    event_loop: asyncio.AbstractEventLoop, semi_random_user: User
+):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.put(
             f"/user/update_user/{semi_random_user.telegram_id}",
@@ -96,7 +102,9 @@ async def test_update_user(event_loop, semi_random_user: User):
 
 @pytest.mark.order(5)
 @pytest.mark.asyncio
-async def test_delete_user(event_loop, semi_random_user: User):
+async def test_delete_user(
+    event_loop: asyncio.AbstractEventLoop, semi_random_user: User
+):
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.delete(
             f"/user/delete_user/{semi_random_user.telegram_id}",
