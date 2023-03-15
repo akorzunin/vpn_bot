@@ -2,7 +2,7 @@
 
 import asyncio
 import pytest
-import unittest.mock as mock
+from unittest import mock
 from aiogram import types
 import dill
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
