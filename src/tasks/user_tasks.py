@@ -86,3 +86,28 @@ def get_next_payment_date(user_next_payment: datetime) -> datetime:
     ):
         return datetime.now(timezone.utc) + src.BILL_PERIOD
     return user_next_payment + src.BILL_PERIOD
+
+
+async def activate_subscription(user_id: int, scheduler=scheduler) -> bool:
+    """Activate user subscription"""
+    # get user
+    user = await crud.get_user_by_telegram_id(user_id)
+    if not user:
+        logging.error(f"User not found {user_id}")
+        return False
+    if user.is_enabled and scheduler.get_job(f"billing_{user.telegram_id}"):
+        logging.warning(f"User {user.telegram_id} is already enabled")
+        # TODO add exception to handle this case
+        return False
+    # update user
+    updated_user = await crud.enable_user(user_id)
+
+    # create billing task
+    scheduler.add_job(
+        billing_task,
+        "date",
+        id=f"billing_{updated_user.telegram_id}",
+        args=[updated_user.telegram_id, scheduler],
+        replace_existing=True,
+    )
+    return True
