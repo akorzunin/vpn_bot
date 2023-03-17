@@ -1,0 +1,6 @@
+class DbException(Exception):
+    ...
+
+
+class UserHasNoConfigs(DbException):
+    ...
