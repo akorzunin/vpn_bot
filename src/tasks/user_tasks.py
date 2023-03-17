@@ -1,10 +1,12 @@
 import logging
 from datetime import datetime, timedelta, timezone
+import asyncio
 
 import src
 from src.db import crud
 from src.db.schemas import Money, User
 from src.tasks.scheduler import scheduler
+from src.aiogram_app import notifications
 
 
 async def recreate_user_billing_tasks(scheduler=scheduler):
@@ -62,20 +64,38 @@ async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
         raise ValueError("User not found")
 
     if user.balance < src.PAYMENT_AMOUNT:
-        await crud.disable_user(telegram_id)
+        async with asyncio.TaskGroup() as group:
+            group.create_task(crud.disable_user(telegram_id))
+            group.create_task(
+                notifications.send_cancel_subscribtion_notification(
+                    telegram_id,
+                    reason="Not enough balance",
+                )
+            )
         return
 
     if user.is_enabled:
         if user.next_payment:
+            # create invoice
             await crud.create_invoice(telegram_id, src.PAYMENT_AMOUNT)
+            # send payment notification
             updated_user = await crud.update_user_next_payment(
                 user.telegram_id,
                 get_next_payment_date(user.next_payment),
             )
+            await notifications.send_payment_notification(
+                updated_user,
+            )
             update_job(updated_user, scheduler)
         else:
             # disable user if he is not intended to pay
-            await crud.disable_user(telegram_id)
+            async with asyncio.TaskGroup() as group:
+                group.create_task(crud.disable_user(telegram_id))
+                group.create_task(
+                    notifications.send_cancel_subscribtion_notification(
+                        telegram_id
+                    )
+                )
 
 
 def get_next_payment_date(user_next_payment: datetime) -> datetime:
@@ -92,13 +112,12 @@ async def activate_subscription(user_id: int, scheduler=scheduler) -> bool:
     """Activate user subscription"""
     # get user
     user = await crud.get_user_by_telegram_id(user_id)
-    if not user:
-        logging.error(f"User not found {user_id}")
-        return False
     if user.is_enabled and scheduler.get_job(f"billing_{user.telegram_id}"):
         logging.warning(f"User {user.telegram_id} is already enabled")
-        # TODO add exception to handle this case
-        return False
+        raise ValueError("User is already enabled")
+    if user.balance < src.PAYMENT_AMOUNT:
+        logging.warning(f"User {user.telegram_id} has not enough balance")
+        raise ValueError("Not enough balance")
     # update user
     updated_user = await crud.enable_user(user_id)
 
@@ -110,4 +129,18 @@ async def activate_subscription(user_id: int, scheduler=scheduler) -> bool:
         args=[updated_user.telegram_id, scheduler],
         replace_existing=True,
     )
+    return True
+
+
+async def deactivate_subscription(user_id: int, scheduler=scheduler) -> bool:
+    """Deactivate user subscription"""
+    # get user
+    user = await crud.get_user_by_telegram_id(user_id)
+    if not user.is_enabled:
+        logging.warning(f"User {user.telegram_id} is already disabled")
+        raise ValueError("User is already disabled")
+    # update user
+    updated_user = await crud.disable_user(user_id)
+    # delete billing task
+    scheduler.remove_job(f"billing_{user.telegram_id}")
     return True

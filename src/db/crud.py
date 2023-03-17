@@ -21,6 +21,7 @@ from src.db.schemas import (
 from src.utils.errors.config_errors import ConfigException
 from src import MAX_CONFIGS
 from src.fastapi_app import pivpn_wrapper as pivpn
+from src.utils.errors.db_errors import UserHasNoConfigs
 from src.utils.errors.pivpn_errors import UserAlreadyDisabledError
 
 
@@ -186,7 +187,7 @@ async def update_user_next_payment(
     return await get_user_by_telegram_id(user_id)
 
 
-async def enable_user(user_id: int):
+async def enable_user(user_id: int) -> User:
     user = await get_user_by_telegram_id(user_id)
     if user:
         enable_all_user_configs(user)
@@ -198,11 +199,13 @@ async def enable_user(user_id: int):
             where("telegram_id") == user_id,
         )
         logging.warning(f"User {user_id} enabled")
+        return await get_user_by_telegram_id(user_id)
+    raise ValueError("User not found")
 
 
 def enable_all_user_configs(user):
     if not user.conf_files:
-        raise ValueError("User has no configs")
+        raise UserHasNoConfigs("User has no configs")
     for vpn_config in user.conf_files:
         pivpn.enable_vpn_config(vpn_config)
 

@@ -1,4 +1,5 @@
 import asyncio
+from functools import wraps
 import logging
 from datetime import UTC
 
@@ -7,12 +8,14 @@ from apscheduler.events import (
     EVENT_JOB_EXECUTED,
     EVENT_JOB_MISSED,
     EVENT_JOB_REMOVED,
+    JobExecutionEvent,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from src import NO_REVIVE_PERIOD
 from src.db import crud
 from src.loop import loop
+from src.aiogram_app import notifications
 
 scheduler_config = {
     "coalesce": True,  # run job after its missed in down time
@@ -29,6 +32,7 @@ scheduler = AsyncIOScheduler(
 
 
 def call_coroutine(coro):
+    @wraps(coro)
     def wrapper(*args, **kwargs):
         loop = asyncio.get_event_loop()
         loop.create_task(coro(*args, **kwargs))
@@ -40,13 +44,13 @@ def get_user_id_from_job_id(job_id: str) -> int:
     return int(job_id.split("_")[1])
 
 
-def exeption_listener(event):
+def exeption_listener(event: JobExecutionEvent):
     if event.exception:
         logging.error(f"{event.exception} The job crashed")
 
 
 @call_coroutine
-async def job_missed_listener(event):
+async def job_missed_listener(event: JobExecutionEvent):
     user_id = get_user_id_from_job_id(event.job_id)
     user = await crud.get_user_by_telegram_id(user_id)
     logging.warning(
@@ -55,13 +59,23 @@ async def job_missed_listener(event):
 
 
 @call_coroutine
-async def job_removed_listener(event):
+async def job_removed_listener(event: JobExecutionEvent):
     logging.info(f"Removed Job {event.job_id}")
+
+
+@call_coroutine
+async def job_success_listener(event: JobExecutionEvent):
+    ...
 
 
 scheduler.add_listener(
     exeption_listener,
-    EVENT_JOB_EXECUTED | EVENT_JOB_ERROR,
+    EVENT_JOB_ERROR,
+)
+
+scheduler.add_listener(
+    job_success_listener,
+    EVENT_JOB_EXECUTED,
 )
 
 scheduler.add_listener(

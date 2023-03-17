@@ -8,6 +8,8 @@ from src.db import crud, promocode_functions
 from src.db.schemas import User, UserUpdate, VpnConfig
 from src.fastapi_app import pivpn_wrapper as pivpn
 from src.fastapi_app.auth import check_credentials, security
+from src.tasks import user_tasks
+from src.utils.errors.db_errors import DbException
 
 
 router = APIRouter()
@@ -86,8 +88,10 @@ async def add_vpn_config(
 ):
     """add given vpn config to user by its telegram_id"""
     check_credentials(credentials)
-    if await crud.find_user_by_telegram_id(user_id):
+    if user := await crud.find_user_by_telegram_id(user_id):
         try:
+            if not user.is_enabled:
+                pivpn.disable_vpn_config(vpn_config)
             crud.add_vpn_config(user_id, vpn_config)
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e)) from e
@@ -103,7 +107,7 @@ async def remove_vpn_config(
     vpn_user: str,
     credentials: HTTPBasicCredentials = Depends(security),
 ):
-    """remove vpn config"""
+    """remove vpn config from user in database"""
     check_credentials(credentials)
     if await crud.get_user_by_telegram_id(user_id):
         crud.remove_vpn_config(user_id, vpn_user)
@@ -148,3 +152,53 @@ async def redeem_code(
         raise HTTPException(status_code=401, detail="Failed to redeem code")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.post("/activate_subscription")
+async def activate_subscription(
+    user_id: int,
+    credentials: HTTPBasicCredentials = Depends(security),
+):
+    """activate subscription"""
+    check_credentials(credentials)
+    # add job to scheduler
+    # change data in db
+    try:
+        if await user_tasks.activate_subscription(user_id):
+            return JSONResponse(
+                status_code=200, content={"message": "Subscription activated"}
+            )
+        raise HTTPException(
+            status_code=401, detail="Failed to activate subscription"
+        )
+    except DbException as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=401, detail="Failed to activate subscription"
+        ) from e
+
+
+@router.post("/deactivate_subscription")
+async def deactivate_subscription(
+    user_id: int,
+    credentials: HTTPBasicCredentials = Depends(security),
+):
+    """deactivate subscription"""
+    check_credentials(credentials)
+    # add job to scheduler
+    # change data in db
+    try:
+        if await user_tasks.deactivate_subscription(user_id):
+            return JSONResponse(
+                status_code=200, content={"message": "Subscription deactivated"}
+            )
+        raise HTTPException(
+            status_code=401, detail="Failed to deactivate subscription"
+        )
+    except DbException as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=401, detail="Failed to deactivate subscription"
+        ) from e
