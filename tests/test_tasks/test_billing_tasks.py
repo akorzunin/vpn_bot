@@ -18,6 +18,12 @@ src.ALLOWED_DOWNTIME_DELAY = mock_globals.ALLOWED_DOWNTIME_DELAY
 
 from src.logger import logger
 
+# mock notifications module
+src.aiogram_app.notifications.send_payment_notification = mock.AsyncMock()
+src.aiogram_app.notifications.send_cancel_subscribtion_notification = (
+    mock.AsyncMock()
+)
+
 
 @pytest.fixture(scope="session")
 def scheduler(event_loop):
