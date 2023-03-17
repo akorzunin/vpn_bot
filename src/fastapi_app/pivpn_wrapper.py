@@ -120,7 +120,6 @@ def add_vpn_config(vpn_config_name: str, host: str = PIVPN_HOST) -> str:
         if "Done!" in line:
             success = True
         if "for easytransfer." in line:
-            print(line)
             for word in line.split():
                 if ".conf" in word:
                     filename = word
@@ -180,6 +179,20 @@ def enable_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
                 f"vpn_config already disabled: {vpn_config}"
             )
         raise ValueError(f"Failed to enable vpn_config: {vpn_config}")
+    return vpn_config
+
+
+def delete_vpn_config(vpn_config: str, host: str = PIVPN_HOST) -> str:
+    data = api_call(
+        "delete", "delete_client", params={"user_name": vpn_config}, host=host
+    )
+    for line in data.splitlines():
+        if "::: Successfully deleted" in line:
+            break
+    else:
+        if "not exist" in data:
+            raise UserNotFoundError(f"vpn_config does not exist: {vpn_config}")
+        raise ValueError(f"Failed to remove vpn_config: {vpn_config}")
     return vpn_config
 
 
