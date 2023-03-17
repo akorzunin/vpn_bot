@@ -181,12 +181,17 @@ async def create_promocode(
         )
         for _ in range(quantity)
     ]
-
+    # TODO change UUID to ULID and check number of actually created promocodes
+    # TODO crete promocodes for O(n) not O(2n)
     for promocode in promocodes:
-        data = promocode_functions.create_promocode(promocode)
-        if data > 1:
-            logging.warning(f"Promocode {promocode.id} already exists")
-    return JSONResponse(status_code=200, content={"status": "ok"})
+        promocode_functions.create_promocode(promocode)
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "ok",
+            "created": len(promocodes),
+        },
+    )
 
 
 @router.post("/hard_enable_user")
