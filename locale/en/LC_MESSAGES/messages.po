@@ -1,0 +1,48 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2023-03-27 19:48+0300\n"
+"PO-Revision-Date: 2023-03-27 19:52+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: src/aiogram_app/admin_commands.py:140
+msgid "Please provide user name and amount"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:10
+msgid "User data:"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:17
+msgid "Enabled users:"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:20
+msgid ""
+"\n"
+"Disabled users"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:28
+msgid "Vpn config file"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:35
+msgid "All user configs:\n"
+msgstr ""
+
+#: src/aiogram_app/message_formatters.py:53
+msgid "Speed test data:"
+msgstr ""

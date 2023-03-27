@@ -1,0 +1,168 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2023-03-27 23:06+0300\n"
+"PO-Revision-Date: 2023-03-27 23:09+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: src/aiogram_app/admin_commands.py:30 src/aiogram_app/admin_commands.py:57
+#: src/aiogram_app/admin_commands.py:74 src/aiogram_app/admin_commands.py:119
+msgid "Please provide vpn config name"
+msgstr "Пожалуйста, укажите имя конфигурации VPN"
+
+#: src/aiogram_app/admin_commands.py:35
+msgid "created"
+msgstr "создан"
+
+#: src/aiogram_app/admin_commands.py:35 src/aiogram_app/admin_commands.py:62
+#: src/aiogram_app/admin_commands.py:79
+msgid "Vpn config"
+msgstr "Файл конфигурации VPN"
+
+#: src/aiogram_app/admin_commands.py:36
+msgid "Config path"
+msgstr "Путь конфига"
+
+#: src/aiogram_app/admin_commands.py:62
+msgid "disabled"
+msgstr "деактивирован"
+
+#: src/aiogram_app/admin_commands.py:79
+msgid "enabled"
+msgstr "активирован"
+
+#: src/aiogram_app/admin_commands.py:128
+msgid "QR code for vpn config"
+msgstr "QR-код для конфигурации VPN"
+
+#: src/aiogram_app/admin_commands.py:138
+msgid "Running speed test..."
+msgstr "Запуск теста скорости подключения..."
+
+#: src/aiogram_app/admin_commands.py:152 src/aiogram_app/admin_commands.py:175
+msgid "Please provide user name and amount"
+msgstr "Пожалуйста, укажите имя пользователя и сумму"
+
+#: src/aiogram_app/admin_commands.py:161
+msgid "Payment created"
+msgstr "Платеж создан"
+
+#: src/aiogram_app/admin_commands.py:163
+msgid "Payment not created"
+msgstr "Платеж не создан"
+
+#: src/aiogram_app/admin_commands.py:184
+msgid "Invoice created"
+msgstr "Счет-фактура создан"
+
+#: src/aiogram_app/admin_commands.py:186
+msgid "Invoice not created"
+msgstr "Счет-фактура не создан"
+
+#: src/aiogram_app/message_formatters.py:10
+msgid "User data:"
+msgstr "Данные пользователя:"
+
+#: src/aiogram_app/message_formatters.py:17
+msgid "Enabled users:"
+msgstr "Активные пользователи:"
+
+#: src/aiogram_app/message_formatters.py:20
+msgid ""
+"\n"
+"Disabled users"
+msgstr ""
+"\n"
+"\vДеактивированные пользователи"
+
+#: src/aiogram_app/message_formatters.py:28
+msgid "Vpn config file"
+msgstr "Файл конфигурации Vpn"
+
+#: src/aiogram_app/message_formatters.py:38
+msgid "All user configs:\n"
+msgstr "Все пользовательские конфиги:\n"
+
+#: src/aiogram_app/message_formatters.py:56
+msgid "Speed test data:"
+msgstr "Данные тестирования скорости:"
+
+#: src/aiogram_app/user_commands.py:30 src/aiogram_app/user_commands.py:58
+msgid "User not found, u can create a new one with /start"
+msgstr "Пользователь не найден, вы можете создать нового с помощью /start"
+
+#: src/aiogram_app/user_commands.py:49
+msgid "Vpn config deleted"
+msgstr "Файл конфигурации Vpn удален"
+
+#: src/aiogram_app/user_commands.py:61
+msgid "User deleted"
+msgstr "Пользователь удален"
+
+#: src/aiogram_app/user_commands.py:71
+msgid "Please provide config user name"
+msgstr "Пожалуйста, укажите имя конфигурации VPN"
+
+#: src/aiogram_app/user_commands.py:80 src/aiogram_app/user_commands.py:115
+#: src/aiogram_app/user_commands.py:133 src/aiogram_app/user_commands.py:166
+#: src/aiogram_app/user_commands.py:183 src/aiogram_app/user_commands.py:197
+#: src/aiogram_app/user_commands.py:211
+msgid "User not found"
+msgstr "Пользователь не найден"
+
+#: src/aiogram_app/user_commands.py:82
+msgid "VPN config removed"
+msgstr "Файл конфигурации VPN удален"
+
+#: src/aiogram_app/user_commands.py:93
+msgid ""
+"Please provide config user name after command\n"
+"/add_config <user_name>"
+msgstr ""
+"Пожалуйста, укажите имя конфигурации VPN\n"
+"/add_config <имя_пользователя>"
+
+#: src/aiogram_app/user_commands.py:136
+msgid "No configs found"
+msgstr "Конфигураций не найдено"
+
+#: src/aiogram_app/user_commands.py:163
+msgid "Balance"
+msgstr "Баланс"
+
+#: src/aiogram_app/user_commands.py:163
+msgid "Next payment"
+msgstr "Следующий платеж"
+
+#: src/aiogram_app/user_commands.py:175
+msgid ""
+"Please provide code\n"
+"/redeem <code>"
+msgstr ""
+"Пожалуйста, укажите код\n"
+"/redeem <код>"
+
+#: src/aiogram_app/user_commands.py:185
+msgid "Code redeemed"
+msgstr "Код погашен"
+
+#: src/aiogram_app/user_commands.py:199
+msgid "Subscription activated"
+msgstr "Подписка активирована"
+
+#: src/aiogram_app/user_commands.py:213
+msgid "Subscription deactivated"
+msgstr "Подписка деактивирована"
