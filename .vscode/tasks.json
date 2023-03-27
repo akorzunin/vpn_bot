@@ -31,6 +31,12 @@
       "detail": "run pytest in poetry venv",
       "type": "shell",
       "command": "poetry run pytest"
+    },
+    {
+      "label": "generate pot gettext",
+      "detail": "from wsl/linux",
+      "type": "shell",
+      "command": "python3 ./pygettext.py -a -o ./locale/messages.pot $(find ./src -iname '*.py')"
     }
   ]
 }

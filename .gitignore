@@ -4,6 +4,7 @@
 **/nohup.out
 .idea/
 *.ttf
+pygettext.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -58,9 +59,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Translations
-*.mo
-*.pot
+# # Translations
+# *.mo
+# *.pot
 
 # Django stuff:
 *.log
