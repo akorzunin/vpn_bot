@@ -4,6 +4,7 @@
 
 from aiogram import types
 from fastapi.security import HTTPBasicCredentials
+from gettext import gettext as _
 
 from src.aiogram_app.aiogram_app import dp
 from src.aiogram_app.message_formatters import (
@@ -15,6 +16,7 @@ from src.db.schemas import Money
 from src.fastapi_app import admin_routes
 from src.db import crud
 from src.fastapi_app.auth import security
+from src.locales import get_locale
 
 
 @dp.message_handler(commands=["add_client", "create_vpn_config"])
@@ -22,14 +24,16 @@ async def create_vpn_config(
     message: types.Message,
 ):
     """"""
+    _ = get_locale(message)
     vpn_config_name = message.get_args()
     if not vpn_config_name:
-        await message.answer("Please provide vpn config name")
+        await message.answer(_("Please provide vpn config name"))
         return
     data = await admin_routes.add_vpn_config(vpn_config_name)
 
     await message.answer(
-        f"Vpn config {vpn_config_name} created\n" f"Config path: {data}"
+        f"{_('Vpn config')} {vpn_config_name} {_('created')}\n"
+        f"{_('Config path')}: {data}"
     )
 
 
@@ -47,13 +51,16 @@ async def disable_vpn_config(
     message: types.Message,
 ):
     """"""
+    _ = get_locale(message)
     vpn_config_name = message.get_args()
     if not vpn_config_name:
-        await message.answer("Please provide vpn config name")
+        await message.answer(_("Please provide vpn config name"))
         return
     data = await admin_routes.disable_vpn_config(vpn_config_name)
 
-    await message.answer(f"Vpn config {vpn_config_name} disabled\n")
+    await message.answer(
+        f"{_('Vpn config')} {vpn_config_name} {_('disabled')}\n"
+    )
 
 
 @dp.message_handler(commands=["enable_client", "enable_vpn_config"])
@@ -61,13 +68,16 @@ async def enable_vpn_config(
     message: types.Message,
 ):
     """"""
+    _ = get_locale(message)
     vpn_config_name = message.get_args()
     if not vpn_config_name:
-        await message.answer("Please provide vpn config name")
+        await message.answer(_("Please provide vpn config name"))
         return
     data = await admin_routes.enable_vpn_config(vpn_config_name)
 
-    await message.answer(f"Vpn config {vpn_config_name} enabled\n")
+    await message.answer(
+        f"{_('Vpn config')} {vpn_config_name} {_('enabled')}\n"
+    )
 
 
 @dp.message_handler(commands=["list_clients", "list_pivpn_users"])
@@ -103,9 +113,10 @@ async def test_qr(
     message: types.Message,
 ):
     """Test qr code generation"""
+    _ = get_locale(message)
     vpn_config = message.get_args()
     if not vpn_config:
-        await message.answer("Please provide vpn config name")
+        await message.answer(_("Please provide vpn config name"))
         return
     try:
         data = await admin_routes.get_vpn_config_qr(vpn_config)
@@ -114,7 +125,7 @@ async def test_qr(
         return
     await message.answer_photo(
         data.body_iterator,
-        caption=f"QR code for vpn config {vpn_config}",
+        caption=f"{_('QR code for vpn config')} {vpn_config}",
     )
 
 
@@ -123,9 +134,10 @@ async def speed_test(
     message: types.Message,
 ):
     """"""
-    answer_message = await message.answer("Running speed test...")
+    _ = get_locale(message)
+    answer_message = await message.answer(_("Running speed test..."))
     data = await admin_routes.speed_test()
-    await answer_message.edit_text(format_speed_test_data(data))
+    await answer_message.edit_text(format_speed_test_data(data, _))
 
 
 @dp.message_handler(commands=["create_payment"])
@@ -133,10 +145,11 @@ async def create_payment(
     message: types.Message,
 ):
     """Makes a payment for a user"""
+    _ = get_locale(message)
     if raw_args := message.get_args():
         args = raw_args.split()
         if len(args) != 2:
-            await message.answer("Please provide user name and amount")
+            await message.answer(_("Please provide user name and amount"))
             return
         user_name, amount = args
 
@@ -145,9 +158,9 @@ async def create_payment(
             user_name,
         )
         if res.status_code == 200:
-            await message.answer("Payment created")
+            await message.answer(_("Payment created"))
         else:
-            await message.answer("Payment not created")
+            await message.answer(_("Payment not created"))
 
 
 @dp.message_handler(commands=["create_invoice"])
@@ -155,10 +168,11 @@ async def create_invoice(
     message: types.Message,
 ):
     """Manually create an invoice for user"""
+    _ = get_locale(message)
     if raw_args := message.get_args():
         args = raw_args.split()
         if len(args) != 2:
-            await message.answer("Please provide user name and amount")
+            await message.answer(_("Please provide user name and amount"))
             return
         user_name, amount = args
 
@@ -167,6 +181,6 @@ async def create_invoice(
             user_name,
         )
         if response:
-            await message.answer("Invoice created")
+            await message.answer(_("Invoice created"))
         else:
-            await message.answer("Invoice not created")
+            await message.answer(_("Invoice not created"))

@@ -51,7 +51,7 @@ def format_param(param: dict):
     return f"{param['value']} {param['units']}"
 
 
-def format_speed_test_data(data: dict) -> str:
+def format_speed_test_data(data: dict, _: Callable = _) -> str:
     """format speed test data in human readable format"""
     data_str = _("Speed test data:")
     for k, v in data.items():
