@@ -25,6 +25,9 @@ from src.aiogram_app import admin_commands
 # register login commands
 from src.aiogram_app import login_commands
 
+# register payment commands
+from src.aiogram_app import payment_commands
+
 
 @dp.errors_handler(
     exception=TelegramAPIError

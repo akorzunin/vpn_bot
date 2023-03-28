@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -29,6 +29,7 @@ class VpnPayment(BaseModel):
     amount: Money
     date: datetime = datetime.now()
     is_confirmed: bool
+    payment_method: Literal["crypto", "FPS"] = "FPS"
 
 
 class User(BaseModel):
