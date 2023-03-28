@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-03-27 23:06+0300\n"
+"POT-Creation-Date: 2023-03-28 23:03+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,6 +73,53 @@ msgstr ""
 msgid "Invoice not created"
 msgstr ""
 
+#: ./src/aiogram_app/login_commands.py:19
+msgid "Login with username"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:24
+msgid "Login with invitation code"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:28
+msgid "Cancel"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:33
+#: ./src/aiogram_app/login_commands.py:74
+#: ./src/aiogram_app/login_commands.py:110
+msgid "You already have an account with username {user.user_name} You can use /help to see available commands"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:42
+msgid "Select a method to login. If you don't use vpn yet, please use username method"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:53
+msgid "Enter your username"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:62
+msgid "Enter your code"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:90
+msgid "User {user.user_name} created U can use ... commands"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:99
+msgid "User {user.user_name} already exists"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:126
+msgid "User linked with code {code} U can use ... commands"
+msgstr ""
+
+#: ./src/aiogram_app/login_commands.py:141
+#: ./src/aiogram_app/login_commands.py:149
+msgid "Login dialog ended"
+msgstr ""
+
 #: ./src/aiogram_app/message_formatters.py:10
 msgid "User data:"
 msgstr ""
@@ -100,6 +147,71 @@ msgstr ""
 msgid "Speed test data:"
 msgstr ""
 
+#: ./src/aiogram_app/message_formatters.py:64
+msgid "Invoice created:"
+msgstr ""
+
+#: ./src/aiogram_app/message_formatters.py:67
+msgid ""
+"\n"
+"To get payment info use /pay_info"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:27
+msgid "Payment information:"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:28
+msgid "*Crypto:*"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:29
+msgid "  LTC: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:30
+msgid "  BTC: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:31
+msgid "  ETH: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:32
+msgid "  XNO: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:33
+msgid "*FPS Bank transfer:*"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:34
+msgid "Phone: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:35
+msgid " Banks: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:36
+msgid " - Sber"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:37
+msgid " - Tinkoff"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:47
+#: ./src/aiogram_app/user_commands.py:80
+#: ./src/aiogram_app/user_commands.py:115
+#: ./src/aiogram_app/user_commands.py:133
+#: ./src/aiogram_app/user_commands.py:166
+#: ./src/aiogram_app/user_commands.py:183
+#: ./src/aiogram_app/user_commands.py:197
+#: ./src/aiogram_app/user_commands.py:211
+msgid "User not found"
+msgstr ""
+
 #: ./src/aiogram_app/user_commands.py:30 ./src/aiogram_app/user_commands.py:58
 msgid "User not found, u can create a new one with /start"
 msgstr ""
@@ -114,16 +226,6 @@ msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:71
 msgid "Please provide config user name"
-msgstr ""
-
-#: ./src/aiogram_app/user_commands.py:80
-#: ./src/aiogram_app/user_commands.py:115
-#: ./src/aiogram_app/user_commands.py:133
-#: ./src/aiogram_app/user_commands.py:166
-#: ./src/aiogram_app/user_commands.py:183
-#: ./src/aiogram_app/user_commands.py:197
-#: ./src/aiogram_app/user_commands.py:211
-msgid "User not found"
 msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:82

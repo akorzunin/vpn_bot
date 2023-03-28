@@ -1,6 +1,6 @@
 import gettext
 from typing import Callable
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 path = "locale"
 gettext.bindtextdomain("messages", path)
@@ -15,5 +15,5 @@ ru = gettext.translation("messages", localedir=path, languages=["ru"])
 _ = gettext.gettext
 
 
-def get_locale(message: Message) -> Callable:
+def get_locale(message: Message | CallbackQuery) -> Callable:
     return ru.gettext if message.from_user.language_code == "ru" else en.gettext

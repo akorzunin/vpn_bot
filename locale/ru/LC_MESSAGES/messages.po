@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-03-27 23:06+0300\n"
-"PO-Revision-Date: 2023-03-27 23:09+0300\n"
+"POT-Creation-Date: 2023-03-28 23:03+0300\n"
+"PO-Revision-Date: 2023-03-28 23:21+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -72,6 +72,60 @@ msgstr "Счет-фактура создан"
 msgid "Invoice not created"
 msgstr "Счет-фактура не создан"
 
+#: src/aiogram_app/login_commands.py:19
+msgid "Login with username"
+msgstr "Вход с именем пользователя"
+
+#: src/aiogram_app/login_commands.py:24
+msgid "Login with invitation code"
+msgstr "Вход с кодом приглашения"
+
+#: src/aiogram_app/login_commands.py:28
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/aiogram_app/login_commands.py:33 src/aiogram_app/login_commands.py:74
+#: src/aiogram_app/login_commands.py:110
+msgid ""
+"You already have an account with username {user.user_name} You can use /help "
+"to see available commands"
+msgstr ""
+"У вас уже есть учетная запись с именем пользователя {user.user_name} Вы "
+"можете использовать /help для просмотра доступных команд"
+
+#: src/aiogram_app/login_commands.py:42
+msgid ""
+"Select a method to login. If you don't use vpn yet, please use username "
+"method"
+msgstr ""
+"Выберите метод для входа в систему. Если вы еще не использовали vpn, "
+"пожалуйста, используйте вход по имени пользователя"
+
+#: src/aiogram_app/login_commands.py:53
+msgid "Enter your username"
+msgstr "Введите имя пользователя"
+
+#: src/aiogram_app/login_commands.py:62
+msgid "Enter your code"
+msgstr "Введите ваш промокод"
+
+#: src/aiogram_app/login_commands.py:90
+msgid "User {user.user_name} created U can use ... commands"
+msgstr ""
+"Пользователь {user.user_name} создан, вы можете использовать ... команды"
+
+#: src/aiogram_app/login_commands.py:99
+msgid "User {user.user_name} already exists"
+msgstr "Пользователь {user.user_name} уже существует"
+
+#: src/aiogram_app/login_commands.py:126
+msgid "User linked with code {code} U can use ... commands"
+msgstr "Пользователь связан с кодом {code} и может использовать ... команды"
+
+#: src/aiogram_app/login_commands.py:141 src/aiogram_app/login_commands.py:149
+msgid "Login dialog ended"
+msgstr "Диалог входа в систему завершен"
+
 #: src/aiogram_app/message_formatters.py:10
 msgid "User data:"
 msgstr "Данные пользователя:"
@@ -100,6 +154,69 @@ msgstr "Все пользовательские конфиги:\n"
 msgid "Speed test data:"
 msgstr "Данные тестирования скорости:"
 
+#: src/aiogram_app/message_formatters.py:64
+msgid "Invoice created:"
+msgstr "Счет-фактура создан:"
+
+#: src/aiogram_app/message_formatters.py:67
+msgid ""
+"\n"
+"To get payment info use /pay_info"
+msgstr ""
+"\n"
+"Чтобы получить информацию о платеже, используйте /pay_info"
+
+#: src/aiogram_app/payment_commands.py:27
+msgid "Payment information:"
+msgstr "Платежная информация:"
+
+#: src/aiogram_app/payment_commands.py:28
+msgid "*Crypto:*"
+msgstr "*Криптовалюта:*"
+
+#: src/aiogram_app/payment_commands.py:29
+msgid "  LTC: "
+msgstr "  LTC:"
+
+#: src/aiogram_app/payment_commands.py:30
+msgid "  BTC: "
+msgstr "  BTC:"
+
+#: src/aiogram_app/payment_commands.py:31
+msgid "  ETH: "
+msgstr "  ETH:"
+
+#: src/aiogram_app/payment_commands.py:32
+msgid "  XNO: "
+msgstr "  XNO:"
+
+#: src/aiogram_app/payment_commands.py:33
+msgid "*FPS Bank transfer:*"
+msgstr "*Банковский перевод СБП:*"
+
+#: src/aiogram_app/payment_commands.py:34
+msgid "Phone: "
+msgstr "Телефон: "
+
+#: src/aiogram_app/payment_commands.py:35
+msgid " Banks: "
+msgstr " Банки:"
+
+#: src/aiogram_app/payment_commands.py:36
+msgid " - Sber"
+msgstr " - Сбер"
+
+#: src/aiogram_app/payment_commands.py:37
+msgid " - Tinkoff"
+msgstr " - Тинькофф"
+
+#: src/aiogram_app/payment_commands.py:47 src/aiogram_app/user_commands.py:80
+#: src/aiogram_app/user_commands.py:115 src/aiogram_app/user_commands.py:133
+#: src/aiogram_app/user_commands.py:166 src/aiogram_app/user_commands.py:183
+#: src/aiogram_app/user_commands.py:197 src/aiogram_app/user_commands.py:211
+msgid "User not found"
+msgstr "Пользователь не найден"
+
 #: src/aiogram_app/user_commands.py:30 src/aiogram_app/user_commands.py:58
 msgid "User not found, u can create a new one with /start"
 msgstr "Пользователь не найден, вы можете создать нового с помощью /start"
@@ -115,13 +232,6 @@ msgstr "Пользователь удален"
 #: src/aiogram_app/user_commands.py:71
 msgid "Please provide config user name"
 msgstr "Пожалуйста, укажите имя конфигурации VPN"
-
-#: src/aiogram_app/user_commands.py:80 src/aiogram_app/user_commands.py:115
-#: src/aiogram_app/user_commands.py:133 src/aiogram_app/user_commands.py:166
-#: src/aiogram_app/user_commands.py:183 src/aiogram_app/user_commands.py:197
-#: src/aiogram_app/user_commands.py:211
-msgid "User not found"
-msgstr "Пользователь не найден"
 
 #: src/aiogram_app/user_commands.py:82
 msgid "VPN config removed"

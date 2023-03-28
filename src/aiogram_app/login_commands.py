@@ -7,36 +7,50 @@ from src.db import crud
 from src.db.schemas import User
 from src.fastapi_app import user_routes
 from src.aiogram_app.telegram_auth import api_credentials
+from src.locales import get_locale
 
 
 @dp.message_handler(commands=["start"])
 async def login_start(message: types.Message):
+    _ = get_locale(message)
     builder = InlineKeyboardMarkup()
     builder.add(
         types.InlineKeyboardButton(
-            text="Login w/ username", callback_data="login_username"
+            text=_("Login with username"), callback_data="login_username"
         ),
     )
     builder.add(
         types.InlineKeyboardButton(
-            text="Login w/ invitation code", callback_data="login_code"
+            text=_("Login with invitation code"), callback_data="login_code"
         ),
     )
     builder.add(
-        types.InlineKeyboardButton(text="Cancel", callback_data="login_end"),
+        types.InlineKeyboardButton(text=_("Cancel"), callback_data="login_end"),
     )
     state = dp.current_state(user=message.from_user.id)
+    if user := await crud.find_user_by_telegram_id(message.from_user.id):
+        await message.answer(
+            _(
+                "You already have an account with username {user.user_name} "
+                "You can use /help to see available commands"
+            ).format(user=user)
+        )
+        await end_login_dialog(message)
+        return
     await state.set_state("LOGIN_START")
     await message.answer(
-        "Select a method to login. "
-        "If you don't use vpn yet, please use username method",
+        _(
+            "Select a method to login. "
+            "If you don't use vpn yet, please use username method"
+        ),
         reply_markup=builder,
     )
 
 
 @dp.callback_query_handler(state="LOGIN_START", text="login_username")
 async def login_username(callback: types.CallbackQuery):
-    await callback.message.answer("Enter your username")
+    _ = get_locale(callback)
+    await callback.message.answer(_("Enter your username"))
     state = dp.current_state(user=callback.from_user.id)
     await state.set_state("LOGIN_USERNAME")
     await callback.answer()
@@ -44,7 +58,8 @@ async def login_username(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(state="LOGIN_START", text="login_code")
 async def login_code(callback: types.CallbackQuery):
-    await callback.message.answer("Enter your code")
+    _ = get_locale(callback)
+    await callback.message.answer(_("Enter your code"))
     state = dp.current_state(user=callback.from_user.id)
     await state.set_state("LOGIN_CODE")
     await callback.answer()
@@ -52,11 +67,14 @@ async def login_code(callback: types.CallbackQuery):
 
 @dp.message_handler(state="LOGIN_USERNAME")
 async def check_login_username(message: types.Message):
+    _ = get_locale(message)
     user = await crud.find_user_by_telegram_id(message.from_user.id)
     if user:
         await message.answer(
-            f"You already have an account w/ username {user.user_name} "
-            "U can use ... commands"
+            _(
+                "You already have an account with username {user.user_name} "
+                "You can use /help to see available commands"
+            ).format(user=user)
         )
         await end_login_dialog(message)
         return
@@ -69,23 +87,30 @@ async def check_login_username(message: types.Message):
     # if response is success send user message that he is created
     if response.status_code == 201:
         await message.reply(
-            f"User {user.user_name} created U can use ... commands", reply=False
+            _("User {user.user_name} created U can use ... commands").format(
+                user=user
+            ),
+            reply=False,
         )
         await end_login_dialog(message)
     # if response is not ok send message that user already exists
     elif response.status_code == 400:
         await message.reply(
-            f"User {user.user_name} already exists", reply=False
+            _("User {user.user_name} already exists").format(user=user),
+            reply=False,
         )
 
 
 @dp.message_handler(state="LOGIN_CODE")
 async def check_login_code(message: types.Message):
+    _ = get_locale(message)
     user = await crud.find_user_by_telegram_id(message.from_user.id)
     if user:
         await message.answer(
-            f"You already have an account w/ username {user.user_name} "
-            "U can use ... commands"
+            _(
+                "You already have an account with username {user.user_name} "
+                "You can use /help to see available commands"
+            ).format(user=user)
         )
         await end_login_dialog(message)
         return
@@ -98,7 +123,9 @@ async def check_login_code(message: types.Message):
         )
         if response.status_code == 200:
             await message.reply(
-                f"User linked with code {code} U can use ... commands",
+                _("User linked with code {code} U can use ... commands").format(
+                    code=code
+                ),
                 reply=False,
             )
     except HTTPException as e:
@@ -110,13 +137,15 @@ async def check_login_code(message: types.Message):
     state=["LOGIN_USERNAME", "LOGIN_START"], text="login_end"
 )
 async def login_end(callback: types.CallbackQuery):
-    await callback.message.answer("Login dialog ended")
+    _ = get_locale(callback)
+    await callback.message.answer(_("Login dialog ended"))
     state = dp.current_state(user=callback.from_user.id)
     await state.reset_state()
     await callback.answer()
 
 
 async def end_login_dialog(message: types.Message):
-    await message.reply("Login dialog ended", reply=False)
+    _ = get_locale(message)
+    await message.reply(_("Login dialog ended"), reply=False)
     state = dp.current_state(user=message.from_user.id)
     await state.reset_state()
