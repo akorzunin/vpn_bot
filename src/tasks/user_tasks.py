@@ -5,6 +5,7 @@ import asyncio
 import src
 from src.db import crud
 from src.db.schemas import Money, User
+from src.locales import get_user_locale
 from src.tasks.scheduler import scheduler
 from src.aiogram_app import notifications
 
@@ -64,12 +65,13 @@ async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
         raise ValueError("User not found")
 
     if user.balance < src.PAYMENT_AMOUNT:
+        _ = get_user_locale(user)
         async with asyncio.TaskGroup() as group:
             group.create_task(crud.disable_user(telegram_id))
             group.create_task(
                 notifications.send_cancel_subscribtion_notification(
-                    telegram_id,
-                    reason="Not enough balance",
+                    user,
+                    reason=_("Not enough balance"),
                 )
             )
         return
@@ -93,7 +95,7 @@ async def billing_task(telegram_id: int, scheduler=scheduler) -> None:
                 group.create_task(crud.disable_user(telegram_id))
                 group.create_task(
                     notifications.send_cancel_subscribtion_notification(
-                        telegram_id
+                        user
                     )
                 )
 
