@@ -1,7 +1,7 @@
 import re
 from typing import Callable, ItemsView
 
-from src.db.schemas import User, VpnPayment
+from src.db.schemas import User, UserPayment, VpnPayment
 from src.locales import en, ru, _
 
 
@@ -59,7 +59,7 @@ def format_speed_test_data(data: dict, _: Callable = _) -> str:
     return data_str
 
 
-def format_invoice(invoice: VpnPayment, _: Callable = _) -> str:
+def format_invoice_created(invoice: UserPayment, _: Callable = _) -> str:
     """format invoice in human readable format"""
     invoice_str = _("Invoice created:")
     for k, v in invoice.dict().items():
