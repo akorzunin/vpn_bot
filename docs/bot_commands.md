@@ -22,4 +22,6 @@ create_payment - ...
 create_invoice - ...
 activate_subscription - Activate subscription for customer. Payment will be accepted immediately.
 deactivate_subscription - Deactivate subscription for customer.
+pay - create invoice
+pay_info - get payment informaion
 ```
