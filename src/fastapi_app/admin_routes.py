@@ -139,7 +139,7 @@ async def create_payment(
     if user_id:
         await crud.create_payment(user_id, amount)
         return JSONResponse(status_code=200, content={"status": "ok"})
-    raise HTTPException(status_code=400, detail="User of user id not found")
+    raise HTTPException(status_code=400, detail="User or user id not found")
 
 
 @router.post("/create_invoice")
