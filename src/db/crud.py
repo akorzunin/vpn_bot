@@ -4,7 +4,7 @@
 """
 
 import contextlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 import logging
 from uuid import uuid4
 from tinydb import Query, where
@@ -13,6 +13,7 @@ from src.db.db_conn import users, payments
 from src.db.schemas import (
     Money,
     User,
+    UserPayment,
     UserUpdate,
     VpnConfig,
     VpnPayment,
@@ -118,42 +119,44 @@ def remove_vpn_config(telegram_id: int, vpn_user: str) -> None:
     )
 
 
-async def create_payment(user_id: int, amount: Money):
-    payment_id = VpnPaymentId(uuid4())
-    payment = VpnPayment(
-        id=payment_id,
-        user_id=user_id,
-        amount=amount,
-        date=datetime.now(),
-        is_confirmed=True,
-    )
+async def create_user_payment(payment: UserPayment) -> VpnPaymentId:
+    """Create payment for user
+    add payment to db, and assing payment id to user
+    """
+    await assingn_payment_to_user(payment)
+    # insert payment
+    payments.insert(payment.dict())
+    return payment.id
 
+
+async def assingn_payment_to_user(payment: UserPayment) -> None:
     User = Query()
     # get all payments
-    user = users.get(User.telegram_id == user_id)
+    user = await get_user_by_telegram_id(payment.user_id)
     if not user:
         raise ValueError("User not found")
-    user_payments = user["all_payments"]
+    user_payments = user.all_payments
     if user_payments is None:
         user_payments = []
     # add new payment
-    user_payments.append(payment_id)
+    user_payments.append(payment.id)
     users.update(
-        {"all_payments": user_payments, "balance": user["balance"] + amount},
-        User.telegram_id == user_id,
+        {
+            "all_payments": user_payments,
+        },
+        User.telegram_id == payment.user_id,
     )
-    # insert payment
-    payments.insert(payment.dict())
 
 
 async def create_invoice(user_id: int, amount: Money):
+    """Used in billing task to add entry about charge in db"""
     payment_id = VpnPaymentId(uuid4())
     payment = VpnPayment(
         id=payment_id,
         user_id=user_id,
         amount=Money(-abs(amount)),
         date=datetime.now(),
-        is_confirmed=True,
+        is_payed=True,
     )
 
     User = Query()
@@ -226,3 +229,32 @@ def disable_all_user_configs(user: User):
         # raise ValueError("User has no configs")
     for vpn_config in user.conf_files:
         pivpn.disable_vpn_config(vpn_config)
+
+
+async def get_paymnet_by_id(payment_id: VpnPaymentId) -> VpnPayment:
+    if payment := payments.get(where("id") == payment_id):
+        return VpnPayment(**payment)
+    raise ValueError("Payment not found")
+
+
+async def accept_payment(payment: VpnPayment) -> VpnPayment:
+    """Mark paymen as confirmed, and add money to user balance"""
+    if payment.is_payed:
+        raise ValueError("Payment already payed")
+    # TODO generalize to another function
+    User = Query()
+    user = await get_user_by_telegram_id(payment.user_id)
+    # TODO update more fields
+    users.update(
+        {
+            "balance": user.balance + payment.amount,
+        },
+        User.telegram_id == payment.user_id,
+    )
+    payment.is_payed = True
+    payment.date_confirmed = datetime.now(UTC)
+    payments.update(
+        payment.dict(),
+        where("id") == payment.id,
+    )
+    return payment

@@ -1,7 +1,8 @@
 """aiogram commands related to payments"""
+import json
 from uuid import uuid4
 from aiogram import types
-from typing import Callable
+from typing import Callable, Literal
 
 from src.aiogram_app.aiogram_app import dp
 from src.aiogram_app.telegram_auth import api_credentials
@@ -12,8 +13,10 @@ from src.fastapi_app import pivpn_wrapper as pivpn
 from src.utils.errors.pivpn_errors import PiVpnException
 from src.locales import get_locale
 from src.aiogram_app.message_formatters import format_invoice_created
+from src.aiogram_app import notifications
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
 from src import (
+    ADMIN_ID,
     PAYMENT_AMOUNT,
     LTC_ADDRESS,
     BTC_ADDRESS,
@@ -51,12 +54,13 @@ async def pay_command(message: types.Message):
         await message.answer(_("User not registered"))
         return
     builder = InlineKeyboardMarkup()
-    if user.pay_comment and user.payment_method:
+    if user.pay_comment and user.payment_method and user.last_amount:
         builder.add(
             types.InlineKeyboardButton(
                 text=_(
                     "Pay with comment: {user.pay_comment}"
                     " and use method: {user.payment_method}"
+                    " amount: {user.last_amount}"
                 ).format(user=user),
                 callback_data="pay_with_comment_from_db",
             )
@@ -107,20 +111,26 @@ async def pay_with_comment_callback(callback: types.CallbackQuery):
     state_data = await state.get_data()
     pay_amount = state_data["amount"]
     pay_comment = state_data["pay_comment"]
-    payment_method = (
+    payment_method: Literal["crypto", "FPS"] = (
         "crypto" if state_data["payment_method"] == "Crypto" else "FPS"
     )
-    invoice = UserPayment(
-        id=VpnPaymentId(uuid4()),
+    res = await payment_routes.create_user_invoice(
         user_id=callback.from_user.id,
-        amount=pay_amount,
         payment_method=payment_method,
+        pay_amount=pay_amount,
         pay_comment=pay_comment,
     )
-    p_id = await payment_routes.create_user_invoice(invoice)
-    # crete payment inside fastapi route
-    ...
+    invoice = UserPayment(**json.loads(json.loads(res.body.decode())))
     await callback.message.answer(format_invoice_created(invoice, _))
+    # update payment data in db
+    if user := await crud.get_user_by_telegram_id(callback.from_user.id):
+        user_update = UserUpdate(
+            payment_method=payment_method,
+            last_amount=pay_amount,
+            pay_comment=pay_comment,
+        )
+        await crud.update_user(user.telegram_id, user_update)
+
     # notify admin
     ...
     await pay_finalize_dialog(callback, _)
@@ -132,19 +142,20 @@ async def pay_comment_callback(callback: types.CallbackQuery):
     user = await crud.get_user_by_telegram_id(callback.from_user.id)
     if user.last_amount is None or user.pay_comment is None:
         raise ValueError("last_amount or pay_comment is None")
-    invoice = UserPayment(
-        id=VpnPaymentId(uuid4()),
+    res = await payment_routes.create_user_invoice(
         user_id=user.telegram_id,
-        amount=user.last_amount,
         payment_method=user.payment_method,
+        pay_amount=user.last_amount,
         pay_comment=user.pay_comment,
     )
-    p_id = await payment_routes.create_user_invoice(invoice)
-    # crete payment inside fastapi route
-    ...
+    invoice = UserPayment(**json.loads(json.loads(res.body.decode())))
+
     await callback.message.answer(format_invoice_created(invoice, _))
     # notify admin
-    ...
+    await notifications.send_payment_notification_to_admin(
+        user,
+        invoice,
+    )
     await pay_finalize_dialog(callback, _)
 
 
@@ -233,3 +244,29 @@ async def pay_finalize_dialog(callback: types.CallbackQuery, _: Callable):
     state = dp.current_state(user=callback.from_user.id)
     await state.reset_state()
     await state.reset_data()
+
+
+def IsAdminFilter(callback: types.CallbackQuery):
+    return callback.from_user.id == ADMIN_ID
+
+
+def IsPaymentFilter(callback: types.CallbackQuery):
+    return "payment" in callback.data
+
+
+@dp.callback_query_handler(IsPaymentFilter)
+async def admin_callback(callback: types.CallbackQuery):
+    _ = get_locale(callback)
+    action, *__, payment_id = callback.data.split("_", 2)
+    if action == "accept":
+        # get payment from db
+        payment = await crud.get_paymnet_by_id(VpnPaymentId(payment_id))
+        payment = await crud.accept_payment(payment)
+        # notify user that payment accepted
+        await notifications.send_payment_accepted_notification(
+            payment,
+        )
+        ...
+
+    await callback.answer(_("Admin callback"))
+    await callback.message.answer(_("Admin callback"), reply=True)

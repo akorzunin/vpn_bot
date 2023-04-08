@@ -28,7 +28,12 @@ class VpnPayment(BaseModel):
     user_id: int
     amount: Money
     date: datetime = datetime.now()
-    is_confirmed: bool
+    # is_confirmed: bool
+    date_created: datetime = datetime.now()
+    date_confirmed: Optional[datetime] = None
+    is_payed: bool = False
+    payment_method: Literal["crypto", "FPS"] = "FPS"
+    pay_comment: Optional[str] = None
 
 
 class UserPayment(BaseModel):
@@ -56,6 +61,7 @@ class User(BaseModel):
     locale: Literal["en", "ru"] = "en"
     pay_comment: Optional[str] = None
     payment_method: Literal["crypto", "FPS"] = "FPS"
+    last_amount: Optional[Money] = None
 
 
 class UserUpdate(BaseModel):
@@ -68,6 +74,7 @@ class UserUpdate(BaseModel):
     locale: Optional[Literal["en", "ru"]] = None
     pay_comment: Optional[str] = None
     payment_method: Optional[Literal["crypto", "FPS"]] = None
+    last_amount: Optional[Money] = None
 
 
 class PromoCode(BaseModel):

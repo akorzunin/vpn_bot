@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.utils.exceptions import TelegramAPIError
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from fastapi import HTTPException
+from src import ADMIN_ID
 
 API_TOKEN = os.getenv("TOKEN")
 # check if token exist else rise error
@@ -44,5 +45,20 @@ async def http_exception_handler(update: types.Update, error: HTTPException):
     await bot.send_message(
         update.message.chat.id,
         f"{error.detail}",
+    )
+    return True
+
+
+def IsAdminErrorFilter(update: types.Update, error: Exception):
+    return update.callback_query.from_user.id == ADMIN_ID
+
+
+@dp.errors_handler(IsAdminErrorFilter, exception=ValueError)
+async def value_error_handler(update: types.Update, error: ValueError):
+    logging.error(f"Get error from value error: {error}")
+    await update.callback_query.answer(f"{error}", show_alert=True)
+    await bot.send_message(
+        update.callback_query.message.chat.id,
+        f"{error}",
     )
     return True

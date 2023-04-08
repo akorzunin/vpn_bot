@@ -16,6 +16,8 @@ BTC_ADDRESS = os.getenv("BTC_ADDRESS", "000000")
 ETH_ADDRESS = os.getenv("ETH_ADDRESS", "000000")
 XNO_ADDRESS = os.getenv("XNO_ADDRESS", "000000")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER", "000000")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "000000"))
+
 
 from src.tasks.task_configs import (
     ALLOWED_DOWNTIME_DELAY,
