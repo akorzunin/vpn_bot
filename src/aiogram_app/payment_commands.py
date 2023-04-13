@@ -167,29 +167,75 @@ async def select_payment_method_crypto_callback(callback: types.CallbackQuery):
     _ = get_locale(callback)
     await callback.answer()
     state = dp.current_state(user=callback.from_user.id)
+    try:
+        pay_comment = f"{callback.from_user.last_name} {callback.from_user.first_name[0]}."
+    except AttributeError:
+        pay_comment = f"No name {callback.from_user.id}"
+    builer = InlineKeyboardMarkup()
+    builer.add(
+        types.InlineKeyboardButton(
+            text=_("Comment: {pay_comment}").format(pay_comment=pay_comment),
+            callback_data=f"comment_{pay_comment}",
+        )
+    )
     await state.set_data({"payment_method": callback.data})
-    await callback.message.answer(_("Enter pay comment"))
+    await callback.message.answer(
+        _("Enter pay comment or select from options"),
+        reply_markup=builer,
+    )
     await state.set_state("PAY_COMMENT_TEXT")
 
 
 @dp.message_handler(state="PAY_COMMENT_TEXT")
 async def pay_comment_text_message(message: types.Message):
-    _ = get_locale(message)
-    state = dp.current_state(user=message.from_user.id)
     pay_comment = message.text.strip()
+    await accept_pay_comment(message, pay_comment, message.from_user.id)
+
+
+async def accept_pay_comment(
+    message: types.Message,
+    pay_comment: str,
+    user_id: int,
+):
+    """user_id is the id of the user who is paying"""
+    _ = get_locale(message)
+    state = dp.current_state(user=user_id)
+    user = await crud.get_user_by_telegram_id(user_id)
     await state.update_data({"pay_comment": pay_comment})
-    await message.answer(_("Enter amount to pay"))
+    builder = InlineKeyboardMarkup()
+    builder.add(
+        types.InlineKeyboardButton(
+            text=_("Amount: {amount}").format(amount=PAYMENT_AMOUNT),
+            callback_data=f"amount_{PAYMENT_AMOUNT}",
+        )
+    )
+    if user.last_amount:
+        builder.add(
+            types.InlineKeyboardButton(
+                text=_("Amount: {user.last_amount}").format(user=user),
+                callback_data=f"amount_{user.last_amount}",
+            )
+        )
+    await message.answer(
+        _("Enter amount to pay or select from options"),
+        reply_markup=builder,
+    )
     await state.set_state("PAY_AMOUNT_TEXT")
 
 
 @dp.message_handler(state="PAY_AMOUNT_TEXT")
 async def pay_amount_text_message(message: types.Message):
     _ = get_locale(message)
-    state = dp.current_state(user=message.from_user.id)
     amount = message.text.strip()
     if not amount.isdigit():
         await message.answer(_("Amount must be integer"))
         return
+    await accept_amount(message, int(amount), message.from_user.id)
+
+
+async def accept_amount(message: types.Message, amount: int, user_id: int):
+    _ = get_locale(message)
+    state = dp.current_state(user=user_id)
     data = await state.get_data()
     pay_comment: str = data["pay_comment"]
     pay_method: str = data["payment_method"]
@@ -270,3 +316,39 @@ async def admin_callback(callback: types.CallbackQuery):
 
     await callback.answer(_("Admin callback"))
     await callback.message.answer(_("Admin callback"), reply=True)
+
+
+def IsCommentFilter(callback: types.CallbackQuery):
+    return "comment" in callback.data
+
+
+@dp.callback_query_handler(IsCommentFilter, state="PAY_COMMENT_TEXT")
+async def comment_callback(callback: types.CallbackQuery):
+    _ = get_locale(callback)
+    await callback.answer(_("Comment set"))
+    pay_comment = callback.data.split("_", 1)[1]
+    await callback.message.answer(
+        _("Comment set: {pay_comment}").format(pay_comment=pay_comment)
+    )
+    await accept_pay_comment(
+        callback.message,
+        pay_comment,
+        user_id=callback.from_user.id,
+    )
+
+
+def IsAmountFilter(callback: types.CallbackQuery):
+    return "amount" in callback.data
+
+
+@dp.callback_query_handler(IsAmountFilter, state="PAY_AMOUNT_TEXT")
+async def amount_callback(callback: types.CallbackQuery):
+    _ = get_locale(callback)
+    amount = callback.data.split("_", 1)[1]
+    await callback.answer(_("Amount set"))
+    await callback.message.answer(
+        _("Amount set: {amount}").format(amount=amount)
+    )
+    await accept_amount(
+        callback.message, int(float(amount)), callback.from_user.id
+    )
