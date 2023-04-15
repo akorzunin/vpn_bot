@@ -1,4 +1,5 @@
 """aiogram commands related to users"""
+from io import BytesIO
 import logging
 from aiogram import types
 from src.logger import logger
@@ -114,10 +115,100 @@ async def add_config(message: types.Message):
     if response.status_code == 400:
         await message.answer(_("User not found"))
     elif response.status_code == 200:
-        await message.answer(
-            escape_markdown(format_vpn_config(data, user_name, _)),
+        document = types.InputFile(
+            BytesIO(data.encode()),
+            filename=f"{user_name}.conf",
+        )
+        await message.answer_document(
+            document=document,
+            caption=escape_markdown(format_vpn_config(data, user_name, _)),
             parse_mode="Markdown",
         )
+
+
+@dp.message_handler(commands=["get_config", "get_vpn_config"])
+async def get_config(message: types.Message):
+    """get user vpn config"""
+    _ = get_locale(message)
+    config_name = message.get_args()
+    if not config_name:
+        await message.answer(
+            _(
+                "Please provide config user name after command\n"
+                "/get_config <user_name>\n"
+                "Or list all configs with command: /list_configs"
+            )
+        )
+        return
+    user = await user_routes.get_user_by_id(
+        message.from_user.id,
+        api_credentials,
+    )
+    if not user.conf_files:
+        await message.answer(_("No configs found"))
+        return
+    config = next(
+        (x for x in user.conf_files if x.user_name == config_name), None
+    )
+    if not config:
+        await message.answer(
+            _(
+                "Config not found\n"
+                "You can add config with command: /add_config <user_name>\n"
+                "Or list configs with command: /list_configs\n"
+            )
+        )
+        return
+    data = await user_routes.get_vpn_config(config.path, api_credentials)
+    document = types.InputFile(
+        BytesIO(data.encode()),
+        filename=f"{config.user_name}.conf",
+    )
+    await message.answer_document(
+        document=document,
+        caption=escape_markdown(format_vpn_config(data, config.user_name, _)),
+        parse_mode="Markdown",
+    )
+
+
+@dp.message_handler(commands=["qr", "get_config_qr"])
+async def get_config_qr(message: types.Message):
+    """get user vpn config"""
+    _ = get_locale(message)
+    config_name = message.get_args()
+    if not config_name:
+        await message.answer(
+            _(
+                "Please provide config user name after command\n"
+                "/qr <user_name>\n"
+                "Or list all configs with command: /list_configs"
+            )
+        )
+        return
+    user = await user_routes.get_user_by_id(
+        message.from_user.id,
+        api_credentials,
+    )
+    if not user.conf_files:
+        await message.answer(_("No configs found"))
+        return
+    config = next(
+        (x for x in user.conf_files if x.user_name == config_name), None
+    )
+    if not config:
+        await message.answer(
+            _(
+                "Config not found\n"
+                "You can add config with command: /add_config <user_name>\n"
+                "Or list configs with command: /list_configs\n"
+            )
+        )
+        return
+    data = await admin_routes.get_vpn_config_qr(config.user_name)
+    await message.answer_photo(
+        data.body_iterator,
+        caption=f"{_('QR code for vpn config')} {config.user_name}",
+    )
 
 
 @dp.message_handler(commands=["list_configs", "list_vpn_configs"])
