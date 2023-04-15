@@ -24,4 +24,6 @@ activate_subscription - Activate subscription for customer. Payment will be acce
 deactivate_subscription - Deactivate subscription for customer.
 pay - create invoice
 pay_info - get payment informaion
+qr - get qr code to vpn config ex: /qr <config_name>
+get_config - get vpn config file ex: /get_config <config_name>
 ```
