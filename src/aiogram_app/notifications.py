@@ -42,7 +42,7 @@ async def send_payment_notification_to_admin(
         "Incoming Payment notification\n"
         "id: {payment.id}\n"
         "User: {user.telegram_id}\n"
-        "Want to pay {payment.amount}\n"
+        "Amount: {payment.amount}\n"
         "Pay comment: {payment.pay_comment}\n"
         "Payment creation date: {payment.date_created}\n"
     ).format(user=user, payment=payment)

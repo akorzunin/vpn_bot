@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-03-28 23:03+0300\n"
+"POT-Creation-Date: 2023-04-15 23:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,6 +58,7 @@ msgid "Please provide user name and amount"
 msgstr ""
 
 #: ./src/aiogram_app/admin_commands.py:161
+#: ./src/aiogram_app/payment_commands.py:291
 msgid "Payment created"
 msgstr ""
 
@@ -73,6 +74,39 @@ msgstr ""
 msgid "Invoice not created"
 msgstr ""
 
+#: ./src/aiogram_app/baisic_commands.py:27
+msgid ""
+"Bot commands:\n"
+"/help - show this message\n"
+"/add_vpn_config - Add vpn config to user account\n"
+"/del_config - Delete vpn config from database and from server.\n"
+"/me - info about user\n"
+"/redeem_code - Redeem code\n"
+"/pay - create invoice\n"
+"/pay_info - get payment informaion\n"
+"/deactivate_subscription - Deactivate subscription for customer.\n"
+msgstr ""
+
+#: ./src/aiogram_app/baisic_commands.py:43
+msgid ""
+"Bot commands:\n"
+"/help - show this message\n"
+"/add_vpn_config - Add vpn config to user account\n"
+"/del_config - Delete vpn config from database and from server.\n"
+"/me - info about user\n"
+"/redeem_code - Redeem code\n"
+"/pay - create invoice\n"
+"/pay_info - get payment informaion\n"
+"/activate_subscription - Activate subscription for customer. Payment will be accepted immediately\n"
+msgstr ""
+
+#: ./src/aiogram_app/baisic_commands.py:57
+msgid ""
+"Bot commands:\n"
+"/help - show this message\n"
+"/start - login"
+msgstr ""
+
 #: ./src/aiogram_app/login_commands.py:19
 msgid "Login with username"
 msgstr ""
@@ -82,6 +116,8 @@ msgid "Login with invitation code"
 msgstr ""
 
 #: ./src/aiogram_app/login_commands.py:28
+#: ./src/aiogram_app/payment_commands.py:75
+#: ./src/aiogram_app/payment_commands.py:252
 msgid "Cancel"
 msgstr ""
 
@@ -157,59 +193,193 @@ msgid ""
 "To get payment info use /pay_info"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:27
-msgid "Payment information:"
+#: ./src/aiogram_app/notifications.py:16
+msgid ""
+"Payment notification:\n"
+"  Balance: {user.balance}\n"
+"  Next payment: {user.next_payment}"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:28
-msgid "*Crypto:*"
+#: ./src/aiogram_app/notifications.py:29
+msgid "Subscription canceled"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:29
-msgid "  LTC: "
+#: ./src/aiogram_app/notifications.py:31
+msgid ""
+"\n"
+"Reason: {reason}"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:30
-msgid "  BTC: "
+#: ./src/aiogram_app/notifications.py:40
+msgid ""
+"FOR ADMIN:\n"
+"Incoming Payment notification\n"
+"id: {payment.id}\n"
+"User: {user.telegram_id}\n"
+"Amount: {payment.amount}\n"
+"Pay comment: {payment.pay_comment}\n"
+"Payment creation date: {payment.date_created}\n"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:31
-msgid "  ETH: "
+#: ./src/aiogram_app/notifications.py:52
+msgid "Accept"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:32
-msgid "  XNO: "
+#: ./src/aiogram_app/notifications.py:56
+msgid "Reject"
+msgstr ""
+
+#: ./src/aiogram_app/notifications.py:70
+msgid ""
+"Payment accepted\n"
+"Amount: {payment.amount}\n"
+"Pay comment: {payment.pay_comment}\n"
+"Payment creation date: {payment.date_created}\n"
 msgstr ""
 
 #: ./src/aiogram_app/payment_commands.py:33
-msgid "*FPS Bank transfer:*"
+msgid "Payment information:"
 msgstr ""
 
 #: ./src/aiogram_app/payment_commands.py:34
-msgid "Phone: "
+msgid "*Crypto:*"
 msgstr ""
 
 #: ./src/aiogram_app/payment_commands.py:35
-msgid " Banks: "
+msgid "  LTC:"
 msgstr ""
 
 #: ./src/aiogram_app/payment_commands.py:36
-msgid " - Sber"
+msgid "  BTC:"
 msgstr ""
 
 #: ./src/aiogram_app/payment_commands.py:37
+msgid "  ETH:"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:38
+msgid "  XNO:"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:39
+msgid "*FPS Bank transfer:*"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:40
+msgid "Phone:"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:41
+msgid " Banks: "
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:42
+msgid " - Sber"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:43
 msgid " - Tinkoff"
 msgstr ""
 
-#: ./src/aiogram_app/payment_commands.py:47
-#: ./src/aiogram_app/user_commands.py:80
-#: ./src/aiogram_app/user_commands.py:115
-#: ./src/aiogram_app/user_commands.py:133
-#: ./src/aiogram_app/user_commands.py:166
-#: ./src/aiogram_app/user_commands.py:183
-#: ./src/aiogram_app/user_commands.py:197
-#: ./src/aiogram_app/user_commands.py:211
-msgid "User not found"
+#: ./src/aiogram_app/payment_commands.py:54
+msgid "User not registered"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:60
+msgid "Pay with comment: {user.pay_comment} and use method: {user.payment_method} amount: {user.last_amount}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:70
+#: ./src/aiogram_app/payment_commands.py:100
+msgid "Select payment method"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:79
+msgid ""
+"Creating payment invoice:\n"
+"  Enter pay comment (your name or any text to\n"
+"  identify your payment)\n"
+"ex: Ivanov I.\n"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:96
+msgid "Crypto"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:98
+msgid "FPS"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:179
+msgid "Comment: {pay_comment}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:185
+msgid "Enter pay comment or select from options"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:210
+msgid "Amount: {amount}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:217
+msgid "Amount: {user.last_amount}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:222
+msgid "Enter amount to pay or select from options"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:233
+msgid "Amount must be integer"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:247
+msgid "Confirm payment"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:256
+msgid ""
+"Create payment\n"
+"  method: {pay_method}\n"
+"  comment: {pay_comment}\n"
+"  amount: {amount}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:283
+#: ./src/aiogram_app/payment_commands.py:284
+msgid "Payment creation canceled"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:317
+msgid "Payment accepted"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:319
+msgid ""
+"Payment accepted: \n"
+"id: {payment.id}\n"
+"comment: {payment.pay_comment}\n"
+"method: {payment.payment_method}\n"
+"amount: {payment.amount}\n"
+"created: {payment.date_created}\n"
+"confirmed: {payment.date_confirmed}\n"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:339
+msgid "Comment set"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:342
+msgid "Comment set: {pay_comment}"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:359
+msgid "Amount set"
+msgstr ""
+
+#: ./src/aiogram_app/payment_commands.py:361
+msgid "Amount set: {amount}"
 msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:30 ./src/aiogram_app/user_commands.py:58
@@ -226,6 +396,16 @@ msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:71
 msgid "Please provide config user name"
+msgstr ""
+
+#: ./src/aiogram_app/user_commands.py:80
+#: ./src/aiogram_app/user_commands.py:115
+#: ./src/aiogram_app/user_commands.py:133
+#: ./src/aiogram_app/user_commands.py:166
+#: ./src/aiogram_app/user_commands.py:183
+#: ./src/aiogram_app/user_commands.py:197
+#: ./src/aiogram_app/user_commands.py:211
+msgid "User not found"
 msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:82
@@ -266,5 +446,9 @@ msgstr ""
 
 #: ./src/aiogram_app/user_commands.py:213
 msgid "Subscription deactivated"
+msgstr ""
+
+#: ./src/tasks/user_tasks.py:74
+msgid "Not enough balance"
 msgstr ""
 
