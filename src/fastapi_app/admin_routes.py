@@ -127,6 +127,8 @@ async def create_payment(
     user_id: int | None = None,
 ):
     """create payment"""
+    # TODO fix method to create payment as admin for user
+
     # if user_id is dfeined, then user_name is ignored
     if user_id is None:
         user = await crud.get_user_by_user_name(user_name)

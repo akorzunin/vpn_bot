@@ -131,8 +131,10 @@ async def pay_with_comment_callback(callback: types.CallbackQuery):
         )
         await crud.update_user(user.telegram_id, user_update)
 
-    # notify admin
-    ...
+    await notifications.send_payment_notification_to_admin(
+        user,
+        invoice,
+    )
     await pay_finalize_dialog(callback, _)
 
 
@@ -209,7 +211,7 @@ async def accept_pay_comment(
             callback_data=f"amount_{PAYMENT_AMOUNT}",
         )
     )
-    if user.last_amount:
+    if user.last_amount and user.last_amount != PAYMENT_AMOUNT:
         builder.add(
             types.InlineKeyboardButton(
                 text=_("Amount: {user.last_amount}").format(user=user),
@@ -312,10 +314,19 @@ async def admin_callback(callback: types.CallbackQuery):
         await notifications.send_payment_accepted_notification(
             payment,
         )
-        ...
-
-    await callback.answer(_("Admin callback"))
-    await callback.message.answer(_("Admin callback"), reply=True)
+        await callback.answer(_("Payment accepted"))
+        await callback.message.answer(
+            _(
+                "Payment accepted: \n"
+                "id: {payment.id}\n"
+                "comment: {payment.pay_comment}\n"
+                "method: {payment.payment_method}\n"
+                "amount: {payment.amount}\n"
+                "created: {payment.date_created}\n"
+                "confirmed: {payment.date_confirmed}\n"
+            ).format(payment=payment),
+            reply=True,
+        )
 
 
 def IsCommentFilter(callback: types.CallbackQuery):
