@@ -30,10 +30,13 @@ async def t_me(message: types.Message):
         await message.answer(
             _("User not found, u can create a new one with /start")
         )
-    else:
-        # format user in human readable format
-        user_str = prepare_user_str(user, _)
-        await message.answer(user_str)
+        return
+    # format user in human readable format
+    user_str = prepare_user_str(user, _)
+    await message.answer(
+        user_str,
+        parse_mode=types.ParseMode.MARKDOWN,
+    )
 
 
 @dp.message_handler(commands=["delete_user", "del_me"])

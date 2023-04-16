@@ -7,6 +7,31 @@ from src.locales import en, ru, _
 
 def prepare_user_str(user: User | ItemsView, _: Callable = _) -> str:
     """format user in human readable format"""
+    if isinstance(user, User):
+        if user.conf_files:
+            conf_files = "".join(
+                [f"    *{file.user_name}*\n" for file in user.conf_files]
+            )
+        else:
+            conf_files = _("  No configuration files\n")
+        return _(
+            "User data:\n"
+            "- *Username*: {user.user_name}\n"
+            "- *Telegram ID:* {user.telegram_id}\n"
+            "- *Locale:* {user.locale}\n"
+            "- *Balance:* {user.balance}\n"
+            "- *Last payment:* {user.last_payment}\n"
+            "- *Next payment:* {user.last_payment}\n"
+            "- *Total payments:* {all_payments}\n"
+            "- *Created at:* {user.created_at}\n"
+            "- *Is enabled:* {user.is_enabled}\n"
+            "- *Configuration files:*\n"
+            "{conf_files}"
+        ).format(
+            user=user,
+            conf_files=conf_files,
+            all_payments=len(user.all_payments),
+        )
     user_str = _("User data:")
     for k, v in user:
         user_str += f"\n  {k}: {v}"
