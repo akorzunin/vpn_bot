@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-04-15 23:13+0300\n"
-"PO-Revision-Date: 2023-04-15 23:23+0300\n"
+"POT-Creation-Date: 2023-04-16 15:23+0300\n"
+"PO-Revision-Date: 2023-04-16 15:25+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -44,7 +44,7 @@ msgstr "деактивирован"
 msgid "enabled"
 msgstr "активирован"
 
-#: src/aiogram_app/admin_commands.py:128
+#: src/aiogram_app/admin_commands.py:128 src/aiogram_app/user_commands.py:213
 msgid "QR code for vpn config"
 msgstr "QR-код для конфигурации VPN"
 
@@ -184,15 +184,47 @@ msgstr "Пользователь связан с кодом {code} и может
 msgid "Login dialog ended"
 msgstr "Диалог входа в систему завершен"
 
-#: src/aiogram_app/message_formatters.py:10
+#: src/aiogram_app/message_formatters.py:16
+msgid "  No configuration files\n"
+msgstr "  Нет файлов конфигурации\n"
+
+#: src/aiogram_app/message_formatters.py:17
+msgid ""
+"User data:\n"
+"- *Username*: {user.user_name}\n"
+"- *Telegram ID:* {user.telegram_id}\n"
+"- *Locale:* {user.locale}\n"
+"- *Balance:* {user.balance}\n"
+"- *Last payment:* {user.last_payment}\n"
+"- *Next payment:* {user.last_payment}\n"
+"- *Total payments:* {all_payments}\n"
+"- *Created at:* {user.created_at}\n"
+"- *Is enabled:* {user.is_enabled}\n"
+"- *Configuration files:*\n"
+"{conf_files}"
+msgstr ""
+"Данные пользователя:\n"
+"- *Имя пользователя*: {user.user_name}\n"
+"- *Идентификатор телеграммы:* {user.telegram_id}\n"
+"- *Локаль:* {user.locale}\n"
+"- *Баланс:* {user.balance}\n"
+"- *Последний платеж:* {user.last_payment}\n"
+"- *Следующий платеж:* {user.last_payment}\n"
+"- *Всего платежей:* {all_payments}\n"
+"- *Создан в:* {user.created_at}\n"
+"- *Включено:* {user.is_enabled}\n"
+"- *Файлы конфигурации:*\n"
+"{conf_files}"
+
+#: src/aiogram_app/message_formatters.py:35
 msgid "User data:"
 msgstr "Данные пользователя:"
 
-#: src/aiogram_app/message_formatters.py:17
+#: src/aiogram_app/message_formatters.py:42
 msgid "Enabled users:"
 msgstr "Активные пользователи:"
 
-#: src/aiogram_app/message_formatters.py:20
+#: src/aiogram_app/message_formatters.py:45
 msgid ""
 "\n"
 "Disabled users"
@@ -200,23 +232,23 @@ msgstr ""
 "\n"
 "Деактивированные пользователи"
 
-#: src/aiogram_app/message_formatters.py:28
+#: src/aiogram_app/message_formatters.py:53
 msgid "Vpn config file"
 msgstr "Файл конфигурации Vpn"
 
-#: src/aiogram_app/message_formatters.py:38
+#: src/aiogram_app/message_formatters.py:63
 msgid "All user configs:\n"
 msgstr "Все пользовательские конфиги:\n"
 
-#: src/aiogram_app/message_formatters.py:56
+#: src/aiogram_app/message_formatters.py:81
 msgid "Speed test data:"
 msgstr "Данные тестирования скорости:"
 
-#: src/aiogram_app/message_formatters.py:64
+#: src/aiogram_app/message_formatters.py:89
 msgid "Invoice created:"
 msgstr "Счет-фактура создан:"
 
-#: src/aiogram_app/message_formatters.py:67
+#: src/aiogram_app/message_formatters.py:92
 msgid ""
 "\n"
 "To get payment info use /pay_info"
@@ -448,34 +480,34 @@ msgstr "Сумма принята"
 msgid "Amount set: {amount}"
 msgstr "Сумма принята: {amount}"
 
-#: src/aiogram_app/user_commands.py:30 src/aiogram_app/user_commands.py:58
+#: src/aiogram_app/user_commands.py:31 src/aiogram_app/user_commands.py:62
 msgid "User not found, u can create a new one with /start"
 msgstr "Пользователь не найден, вы можете создать нового с помощью /start"
 
-#: src/aiogram_app/user_commands.py:49
+#: src/aiogram_app/user_commands.py:53
 msgid "Vpn config deleted"
 msgstr "Файл конфигурации Vpn удален"
 
-#: src/aiogram_app/user_commands.py:61
+#: src/aiogram_app/user_commands.py:65
 msgid "User deleted"
 msgstr "Пользователь удален"
 
-#: src/aiogram_app/user_commands.py:71
+#: src/aiogram_app/user_commands.py:75
 msgid "Please provide config user name"
 msgstr "Пожалуйста, укажите имя конфигурации VPN"
 
-#: src/aiogram_app/user_commands.py:80 src/aiogram_app/user_commands.py:115
-#: src/aiogram_app/user_commands.py:133 src/aiogram_app/user_commands.py:166
-#: src/aiogram_app/user_commands.py:183 src/aiogram_app/user_commands.py:197
-#: src/aiogram_app/user_commands.py:211
+#: src/aiogram_app/user_commands.py:84 src/aiogram_app/user_commands.py:119
+#: src/aiogram_app/user_commands.py:227 src/aiogram_app/user_commands.py:260
+#: src/aiogram_app/user_commands.py:277 src/aiogram_app/user_commands.py:291
+#: src/aiogram_app/user_commands.py:305
 msgid "User not found"
 msgstr "Пользователь не найден"
 
-#: src/aiogram_app/user_commands.py:82
+#: src/aiogram_app/user_commands.py:86
 msgid "VPN config removed"
 msgstr "Файл конфигурации VPN удален"
 
-#: src/aiogram_app/user_commands.py:93
+#: src/aiogram_app/user_commands.py:97
 msgid ""
 "Please provide config user name after command\n"
 "/add_config <user_name>"
@@ -483,19 +515,51 @@ msgstr ""
 "Пожалуйста, укажите имя конфигурации VPN\n"
 "/add_config <имя_пользователя>"
 
-#: src/aiogram_app/user_commands.py:136
+#: src/aiogram_app/user_commands.py:139
+msgid ""
+"Please provide config user name after command\n"
+"/get_config <user_name>\n"
+"Or list all configs with command: /list_configs"
+msgstr ""
+"Пожалуйста, укажите имя пользователя конфигурации после команды\n"
+"/get_config <имя_пользователя>\n"
+"Или перечислите все конфигурации с помощью команды: /list_configs"
+
+#: src/aiogram_app/user_commands.py:151 src/aiogram_app/user_commands.py:196
+#: src/aiogram_app/user_commands.py:230
 msgid "No configs found"
 msgstr "Конфигураций не найдено"
 
-#: src/aiogram_app/user_commands.py:163
+#: src/aiogram_app/user_commands.py:158 src/aiogram_app/user_commands.py:203
+msgid ""
+"Config not found\n"
+"You can add config with command: /add_config <user_name>\n"
+"Or list configs with command: /list_configs\n"
+msgstr ""
+"Конфигурация не найдена\n"
+"Вы можете добавить конфигурацию с помощью команды: /add_config "
+"<имя_пользователя>\n"
+"Или перечислить конфигурации с помощью команды: /list_configs\n"
+
+#: src/aiogram_app/user_commands.py:184
+msgid ""
+"Please provide config user name after command\n"
+"/qr <user_name>\n"
+"Or list all configs with command: /list_configs"
+msgstr ""
+"Пожалуйста, укажите имя пользователя конфигурации после команды\n"
+"/qr <имя_пользователя>\n"
+"Или получите все конфигурации с помощью команды: /list_configs"
+
+#: src/aiogram_app/user_commands.py:257
 msgid "Balance"
 msgstr "Баланс"
 
-#: src/aiogram_app/user_commands.py:163
+#: src/aiogram_app/user_commands.py:257
 msgid "Next payment"
 msgstr "Следующий платеж"
 
-#: src/aiogram_app/user_commands.py:175
+#: src/aiogram_app/user_commands.py:269
 msgid ""
 "Please provide code\n"
 "/redeem <code>"
@@ -503,15 +567,15 @@ msgstr ""
 "Пожалуйста, укажите код\n"
 "/redeem <код>"
 
-#: src/aiogram_app/user_commands.py:185
+#: src/aiogram_app/user_commands.py:279
 msgid "Code redeemed"
 msgstr "Код погашен"
 
-#: src/aiogram_app/user_commands.py:199
+#: src/aiogram_app/user_commands.py:293
 msgid "Subscription activated"
 msgstr "Подписка активирована"
 
-#: src/aiogram_app/user_commands.py:213
+#: src/aiogram_app/user_commands.py:307
 msgid "Subscription deactivated"
 msgstr "Подписка деактивирована"
 
