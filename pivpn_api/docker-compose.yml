@@ -4,7 +4,7 @@ services:
   pivpn_api:
     image: pivpn_api
     build:
-      context: ./pivpn_api
+      context: .
       dockerfile: ./Dockerfile
     ports:
       - ${PORT:-7070}:7070
