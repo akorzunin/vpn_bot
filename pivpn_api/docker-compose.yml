@@ -4,10 +4,12 @@ services:
   pivpn_api:
     image: pivpn_api
     build:
-      context: .
+      context: ./pivpn_api
       dockerfile: ./Dockerfile
     ports:
-      - 10002:7070
+      - ${PORT:-7070}:7070
     restart: unless-stopped
     volumes:
       - ./pipes:/pipes:rw
+    env_file:
+      - ./.env
